@@ -1,10 +1,12 @@
 #include "EdgelDetector.h"
 
 
-
-EdgelDetector::EdgelDetector() {
+void EdgelDetector::setBuffer(Buffer* buffer) {
+	this->buffer = buffer;
 }
 
+std::vector<Edgel> EdgelDetector::findEdgels() {
 
-EdgelDetector::~EdgelDetector() {
+
+	return std::vector<Edgel>();
 }

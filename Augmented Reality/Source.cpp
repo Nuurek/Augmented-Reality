@@ -3,14 +3,16 @@
 #include <string>
 
 #include "Buffer.h"
+#include "EdgelDetector.h"
+
 
 const unsigned int FPS = 30;
 const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
-const char * WINDOW_NAME = "Camera capture";
+const char* WINDOW_NAME = "Camera capture";
 
 const bool WRITE_VIDEO = true;
-const char * WRITE_FILENAME = "capture.mpeg";
+const char* WRITE_FILENAME = "capture.mpeg";
 
 
 int exitWithError(const char * errorMessage) {
@@ -40,11 +42,14 @@ int main(int argc, char** argv) {
 
 	cv::Mat frame;
 	Buffer buffer;
+	EdgelDetector detector;
+	detector.setBuffer(&buffer);
 
 	while (true) {
 		camera >> frame;
 		
 		buffer.setFrame(frame);
+		detector.findEdgels();
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
