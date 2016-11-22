@@ -1,7 +1,8 @@
 #include "opencv2/opencv.hpp"
-
-
 #include <iostream>
+#include <string>
+
+#include "Buffer.h"
 
 const unsigned int FPS = 30;
 const unsigned int FRAME_WIDTH = 640;
@@ -37,9 +38,13 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	cv::Mat frame;
+	Buffer buffer;
+
 	while (true) {
-		cv::Mat frame;
 		camera >> frame;
+		
+		buffer.setFrame(frame);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
