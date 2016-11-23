@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <functional>
 #include "Buffer.h"
 #include "Edgel.h"
 
@@ -22,6 +23,8 @@ class EdgelDetector {
 	static const size_t regionSize;
 
 	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionWidth, size_t regionHeight);
+	std::vector<Edgel> iterateOverDimensions(size_t regionLeft, size_t regionTop, size_t firstLimit, size_t secondLimit, size_t pitch,
+		std::function<size_t()> pixelPosition, std::function<Edgel()> createEdgel);
 	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
 
 public:

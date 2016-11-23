@@ -59,7 +59,7 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 			}
 
 			if (previousPixelOne > 0 && previousPixelOne > previousPixelTwo && previousPixelOne > firstChannel) {
-				edgels.emplace_back(Edgel(x, y));
+				edgels.emplace_back(Edgel(regionLeft + x, regionTop + y));
 			}
 			previousPixelTwo = previousPixelOne;
 			previousPixelOne = firstChannel;
@@ -83,7 +83,7 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 			}
 
 			if (previousPixelOne > 0 && previousPixelOne > previousPixelTwo && previousPixelOne > firstChannel) {
-				edgels.emplace_back(Edgel(x, y));
+				edgels.emplace_back(Edgel(regionLeft + x, regionTop + y));
 			}
 			previousPixelTwo = previousPixelOne;
 			previousPixelOne = firstChannel;
@@ -94,6 +94,39 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 
 	return edgels;
 }
+
+std::vector<Edgel> EdgelDetector::iterateOverDimensions(size_t regionLeft, size_t regionTop, size_t firstLimit, size_t secondLimit, size_t pitch,
+	std::function<size_t()> pixelPositionFunction, std::function<Edgel()> createEdgel) {
+	
+	std::vector<Edgel> edgels;
+
+	for (size_t firstDimension = 0; firstDimension < firstLimit; firstDimension += STEP_SIZE) {
+		size_t width = buffer->getWidth();
+		unsigned int previousPixelOne = 0, previousPixelTwo = 0;
+		unsigned char* pixelPosition = buffer->getData() + pixelPositionFunction();
+
+		for (size_t secondDimension = 0; secondDimension < secondLimit; secondDimension += STEP_SIZE) {
+			unsigned int firstChannel = edgeKernel(pixelPosition, pitch);
+			if (firstChannel > KERNEL_THRESHOLD &&
+				edgeKernel(pixelPosition + 1, pitch) > KERNEL_THRESHOLD &&
+				edgeKernel(pixelPosition + 2, pitch) > KERNEL_THRESHOLD) {
+			} else {
+				firstChannel = 0;
+			}
+
+			if (previousPixelOne > 0 && previousPixelOne > previousPixelTwo && previousPixelOne > firstChannel) {
+				edgels.emplace_back(createEdgel());
+			}
+			previousPixelTwo = previousPixelOne;
+			previousPixelOne = firstChannel;
+
+			pixelPosition += pitch;
+		}
+	}
+
+}
+
+
 
 unsigned int EdgelDetector::edgeKernel(unsigned char* offset, size_t pitch) const {
 	int kernel = 0;
