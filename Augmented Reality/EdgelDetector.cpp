@@ -1,10 +1,8 @@
 #include "EdgelDetector.h"
 
 
-EdgelDetector::EdgelDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize) :
-	BORDER_SIZE(borderSize), REGION_SIZE(regionSize), STEP_SIZE(stepSize)
-{
-}
+EdgelDetector::EdgelDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize) 
+	: RegionBasedOperator(borderSize, regionSize, stepSize) {}
 
 void EdgelDetector::setBuffer(Buffer* buffer) {
 	this->buffer = buffer;

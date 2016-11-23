@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <chrono>
 #include <functional>
+#include "RegionBasedOperator.h"
 #include "Buffer.h"
 #include "Edgel.h"
 
@@ -10,12 +11,8 @@
 const size_t NUMBER_OF_CHANNELS = 3;
 const size_t KERNEL_THRESHOLD = 255;
 
-class EdgelDetector {
+class EdgelDetector : RegionBasedOperator {
 	Buffer* buffer;
-
-	const size_t BORDER_SIZE;
-	const size_t REGION_SIZE;
-	const size_t STEP_SIZE;
 
 	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionWidth, size_t regionHeight);
 	std::vector<Edgel> iterateOverDimensions(size_t regionLeft, size_t regionTop, size_t firstLimit, size_t secondLimit, size_t pitch,

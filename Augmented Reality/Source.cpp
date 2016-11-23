@@ -5,6 +5,7 @@
 
 #include "Buffer.h"
 #include "EdgelDetector.h"
+#include "FrameDecorator.h"
 
 
 const unsigned int FPS = 30;
@@ -48,6 +49,7 @@ int main(int argc, char** argv) {
 	Buffer buffer;
 	EdgelDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	detector.setBuffer(&buffer);
+	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
 	while (true) {
 		camera >> frame;
@@ -59,6 +61,9 @@ int main(int argc, char** argv) {
 		auto end = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		std::cout << duration << "us\n";
+
+		decorator.drawRegionLines(frame);
+		decorator.drawSubRegionLines(frame);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
