@@ -14,6 +14,7 @@ std::vector<Edgel> EdgelDetector::findEdgels() {
 
 	long long totalTime = 0;
 	size_t edgelsFound = 0;
+	numberOfIterations = 0;
 
 	auto edgels = std::vector<Edgel>();
 
@@ -32,6 +33,7 @@ std::vector<Edgel> EdgelDetector::findEdgels() {
 		}
 	}
 
+	std::cout << "Number of iterations: " << numberOfIterations << "\n";
 	std::cout << "Calculating regions: " << totalTime << "us.\n";
 	std::cout << "Found edgels: " << edgelsFound << "\n";
 
@@ -50,6 +52,7 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 		const size_t pitch = NUMBER_OF_CHANNELS;
 
 		for (size_t x = 0; x < regionWidth; x++) {
+			++numberOfIterations;
 			unsigned int firstChannel = edgeKernel(pixelPosition, pitch);
 			if (firstChannel > KERNEL_THRESHOLD &&
 				edgeKernel(pixelPosition + 1, pitch) > KERNEL_THRESHOLD &&
@@ -76,6 +79,7 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 		const size_t pitch = width * NUMBER_OF_CHANNELS;
 
 		for (size_t y = 0; y < regionHeight; y++) {
+			++numberOfIterations;
 			unsigned int firstChannel = edgeKernel(pixelPosition, pitch);
 			if (firstChannel > KERNEL_THRESHOLD &&
 				edgeKernel(pixelPosition + 1, pitch) > KERNEL_THRESHOLD &&
@@ -133,31 +137,28 @@ std::vector<Edgel> EdgelDetector::iterateOverDimensions(size_t regionLeft, size_
 
 
 unsigned int EdgelDetector::edgeKernel(unsigned char* offset, size_t pitch) const {
-	int kernel = 0;
-
-	for (size_t index = 0; index < 2 * BORDER_SIZE + 1; index++) {
-		kernel += GAUSSIAN_COEFFICIENTS[index] * offset[(index - BORDER_SIZE) * pitch];
-	}
+	int kernel = -3 * offset[-2 * pitch];
+	kernel += -5 * offset[-pitch];
+	kernel += 5 * offset[pitch];
+	kernel += 3 * offset[2 * pitch];
 
 	return abs(kernel);
 }
 
 Vector2f EdgelDetector::edgelGradientIntensity(size_t x, size_t y) const {
-	int gradientX = 0;
-	gradientX += GRADIENT_COEFFICIENTS[0][0] * buffer->getPixel(x - 1, y - 1);
-	gradientX += GRADIENT_COEFFICIENTS[0][1] * buffer->getPixel(x, y - 1);
-	gradientX += GRADIENT_COEFFICIENTS[0][2] * buffer->getPixel(x + 1, y - 1);
-	gradientX += GRADIENT_COEFFICIENTS[1][0] * buffer->getPixel(x - 1, y + 1);
-	gradientX += GRADIENT_COEFFICIENTS[1][1] * buffer->getPixel(x, y + 1);
-	gradientX += GRADIENT_COEFFICIENTS[1][2] * buffer->getPixel(x + 1, y + 1);
+	int gradientX = buffer->getPixel(x - 1, y - 1);
+	gradientX += 2 * buffer->getPixel(x, y - 1);
+	gradientX += buffer->getPixel(x + 1, y - 1);
+	gradientX -= buffer->getPixel(x - 1, y + 1);
+	gradientX -= 2 * buffer->getPixel(x, y + 1);
+	gradientX -= buffer->getPixel(x + 1, y + 1);
 
-	int gradientY = 0;
-	gradientY += GRADIENT_COEFFICIENTS[0][0] * buffer->getPixel(x - 1, y - 1);
-	gradientY += GRADIENT_COEFFICIENTS[0][1] * buffer->getPixel(x - 1, y);
-	gradientY += GRADIENT_COEFFICIENTS[0][2] * buffer->getPixel(x - 1, y + 1);
-	gradientY += GRADIENT_COEFFICIENTS[1][0] * buffer->getPixel(x + 1, y - 1);
-	gradientY += GRADIENT_COEFFICIENTS[1][1] * buffer->getPixel(x + 1, y);
-	gradientY += GRADIENT_COEFFICIENTS[1][2] * buffer->getPixel(x + 1, y + 1);
+	int gradientY = buffer->getPixel(x - 1, y - 1);
+	gradientY += 2 * buffer->getPixel(x - 1, y);
+	gradientY += buffer->getPixel(x - 1, y + 1);
+	gradientY -= buffer->getPixel(x + 1, y - 1);
+	gradientY -= 2 * buffer->getPixel(x + 1, y);
+	gradientY -= buffer->getPixel(x + 1, y + 1);
 
-	return Vector2f(static_cast<float>(gradientX), static_cast<float>(gradientY));
+	return Vector2f(static_cast<float>(gradientX), static_cast<float>(gradientY)).get_normalized();
 }

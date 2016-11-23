@@ -13,7 +13,6 @@ const size_t REGION_SIZE = 40;
 const size_t NUMBER_OF_CHANNELS = 3;
 const size_t STEP_SIZE = 5;
 const size_t KERNEL_THRESHOLD = 255;
-const int GRADIENT_COEFFICIENTS [2][3] = { {1, 2, 1}, {-1, -2, -1} };
 
 class EdgelDetector {
 	Buffer* buffer;
@@ -27,6 +26,8 @@ class EdgelDetector {
 		std::function<size_t()> pixelPosition, std::function<Edgel()> createEdgel);
 	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
 	Vector2f edgelGradientIntensity(size_t x, size_t y) const;
+
+	long long numberOfIterations;
 
 public:
 	void setBuffer(Buffer* buffer);
