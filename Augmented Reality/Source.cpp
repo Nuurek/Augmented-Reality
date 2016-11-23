@@ -64,6 +64,7 @@ int main(int argc, char** argv) {
 
 		decorator.drawRegionLines(frame);
 		decorator.drawSubRegionLines(frame);
+		decorator.drawEdgels(frame, edgels);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
