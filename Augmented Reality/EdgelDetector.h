@@ -8,6 +8,9 @@
 const std::vector<float> GAUSSIAN_COEFFICIENTS = { -5.0, -3.0, 0.0, 3.0, 5.0 };
 const size_t BORDER_SIZE = GAUSSIAN_COEFFICIENTS.size() / 2;
 const size_t REGION_SIZE = 40;
+const size_t NUMBER_OF_CHANNELS = 3;
+const size_t STEP_SIZE = 5;
+const size_t KERNEL_THRESHOLD = 255;
 
 
 class EdgelDetector {
@@ -17,7 +20,8 @@ class EdgelDetector {
 	static const size_t borderSize;
 	static const size_t regionSize;
 
-	std::vector<Edgel> findEdgelsInRegion(size_t borderLeft, size_t borderTop, size_t borderRight, size_t borderBottom);
+	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionRight, size_t regionBottom);
+	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
 
 public:
 	void setBuffer(Buffer* buffer);
