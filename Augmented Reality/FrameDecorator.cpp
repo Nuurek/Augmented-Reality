@@ -43,7 +43,7 @@ void FrameDecorator::drawEdgels(cv::Mat& frame, std::vector<Edgel> edgels) {
 }
 
 void FrameDecorator::drawEdgel(cv::Mat & frame, Edgel & edgel) {
-	cv::Point center(edgel.position.x, edgel.position.y);
+	cv::Point center(static_cast<int>(edgel.position.x), static_cast<int>(edgel.position.y));
 
 	cv::Scalar blueColor(128, 0, 0);
 

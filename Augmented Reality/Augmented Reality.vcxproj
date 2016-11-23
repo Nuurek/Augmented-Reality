@@ -153,6 +153,7 @@
     <ClCompile Include="Edgel.cpp" />
     <ClCompile Include="EdgelDetector.cpp" />
     <ClCompile Include="FrameDecorator.cpp" />
+    <ClCompile Include="LineSegmentDetector.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
@@ -162,6 +163,7 @@
     <ClInclude Include="Edgel.h" />
     <ClInclude Include="EdgelDetector.h" />
     <ClInclude Include="FrameDecorator.h" />
+    <ClInclude Include="LineSegmentDetector.h" />
     <ClInclude Include="RegionBasedOperator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
