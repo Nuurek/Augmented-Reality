@@ -4,7 +4,7 @@
 
 struct Edgel {
 public:
-	Edgel(float x, float y);
+	Edgel(size_t x, size_t y, Vector2f slope);
 
 	Vector2f position;
 	Vector2f slope;

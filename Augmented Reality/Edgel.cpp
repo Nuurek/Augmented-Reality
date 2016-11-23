@@ -1,3 +1,5 @@
 #include "Edgel.h"
 
-Edgel::Edgel(float x, float y) : position(Vector2f(static_cast<float>(x), static_cast<float>(y))) {}
+Edgel::Edgel(size_t x, size_t y, Vector2f slope) :
+	position(Vector2f(static_cast<float>(x), static_cast<float>(y))),
+	slope(slope) {}
