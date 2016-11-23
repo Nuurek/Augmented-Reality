@@ -11,10 +11,7 @@
 const size_t NUMBER_OF_CHANNELS = 3;
 const size_t KERNEL_THRESHOLD = 255;
 
-class EdgelDetector : RegionBasedOperator {
-	Buffer* buffer;
-
-	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionWidth, size_t regionHeight);
+class EdgelDetector : public RegionBasedOperator {
 	std::vector<Edgel> iterateOverDimensions(size_t regionLeft, size_t regionTop, size_t firstLimit, size_t secondLimit, size_t pitch,
 		std::function<size_t()> pixelPosition, std::function<Edgel()> createEdgel);
 	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
@@ -25,7 +22,5 @@ class EdgelDetector : RegionBasedOperator {
 public:
 	EdgelDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize);
 
-	void setBuffer(Buffer* buffer);
-
-	std::vector<Edgel> findEdgels();
+	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionWidth, size_t regionHeight);
 };

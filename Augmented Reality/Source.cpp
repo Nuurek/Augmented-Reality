@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include "Buffer.h"
-#include "EdgelDetector.h"
+#include "ARMarkerDetector.h"
 #include "FrameDecorator.h"
 
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
 	cv::Mat frame;
 	Buffer buffer;
-	EdgelDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
+	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
@@ -57,10 +57,12 @@ int main(int argc, char** argv) {
 		buffer.setFrame(frame);
 
 		auto start = std::chrono::high_resolution_clock::now();
-		auto edgels = detector.findEdgels();
+		detector.findARMarkers();
 		auto end = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		std::cout << duration << "us\n";
+
+		auto edgels = detector.getEdgels();
 
 		decorator.drawRegionLines(frame);
 		decorator.drawSubRegionLines(frame);

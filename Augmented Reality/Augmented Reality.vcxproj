@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ARMarkerDetector.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Edgel.cpp" />
     <ClCompile Include="EdgelDetector.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ARMarkerDetector.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Edgel.h" />
     <ClInclude Include="EdgelDetector.h" />

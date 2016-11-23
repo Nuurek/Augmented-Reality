@@ -4,45 +4,6 @@
 EdgelDetector::EdgelDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize) 
 	: RegionBasedOperator(borderSize, regionSize, stepSize) {}
 
-void EdgelDetector::setBuffer(Buffer* buffer) {
-	this->buffer = buffer;
-}
-
-std::vector<Edgel> EdgelDetector::findEdgels() {
-	size_t width = buffer->getWidth();
-	size_t height = buffer->getHeight();
-
-	size_t maxWidth = width - BORDER_SIZE - 1;
-	size_t maxHeight = height - BORDER_SIZE - 1;
-
-	long long totalTime = 0;
-	size_t edgelsFound = 0;
-	numberOfIterations = 0;
-
-	auto edgels = std::vector<Edgel>();
-
-	for (size_t regionTop = BORDER_SIZE; regionTop < maxHeight; regionTop += REGION_SIZE) {
-		for (size_t regionLeft = BORDER_SIZE; regionLeft < maxWidth; regionLeft += REGION_SIZE) {
-			size_t regionWidth = std::min(REGION_SIZE, maxWidth - regionLeft);
-			size_t regionHeight = std::min(REGION_SIZE, maxHeight - regionTop);
-
-			auto start = std::chrono::high_resolution_clock::now();
-			auto edgelsInRegion = findEdgelsInRegion(regionLeft, regionTop, regionWidth, regionHeight);
-			edgels.insert(edgels.end(), edgelsInRegion.begin(), edgelsInRegion.end());
-			auto end = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			totalTime += duration;
-			edgelsFound += edgelsInRegion.size();
-		}
-	}
-
-	std::cout << "Number of iterations: " << numberOfIterations << "\n";
-	std::cout << "Calculating regions: " << totalTime << "us.\n";
-	std::cout << "Found edgels: " << edgelsFound << "\n";
-
-	return edgels;
-}
-
 std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionWidth, size_t regionHeight) {
 	size_t width = buffer->getWidth();
 
@@ -135,6 +96,7 @@ std::vector<Edgel> EdgelDetector::iterateOverDimensions(size_t regionLeft, size_
 		}
 	}
 
+	return std::vector<Edgel>();
 }
 
 
