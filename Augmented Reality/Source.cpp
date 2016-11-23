@@ -6,6 +6,7 @@
 #include "Buffer.h"
 #include "EdgelDetector.h"
 #include "FrameDecorator.h"
+#include "MagicEdgels.h"
 
 
 const unsigned int FPS = 30;
@@ -51,6 +52,8 @@ int main(int argc, char** argv) {
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
+	MagicEdgels magicEdgels(10);
+
 	while (true) {
 		camera >> frame;
 		
@@ -62,9 +65,13 @@ int main(int argc, char** argv) {
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		std::cout << duration << "us\n";
 
-		decorator.drawRegionLines(frame);
-		decorator.drawSubRegionLines(frame);
-		decorator.drawEdgels(frame, edgels);
+		//decorator.drawRegionLines(frame);
+		//decorator.drawSubRegionLines(frame);
+		magicEdgels.updateEdgels(edgels);
+		//edgels = magicEdgels.getLiveEdgels();
+		auto timedEdgels = magicEdgels.getMagicEdgels();
+		//decorator.drawEdgels(frame, edgels);
+		decorator.drawMagicEdgels(frame, timedEdgels);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);

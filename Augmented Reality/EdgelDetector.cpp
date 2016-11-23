@@ -135,6 +135,7 @@ std::vector<Edgel> EdgelDetector::iterateOverDimensions(size_t regionLeft, size_
 		}
 	}
 
+	return edgels;
 }
 
 
