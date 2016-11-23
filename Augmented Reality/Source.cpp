@@ -1,6 +1,7 @@
 #include "opencv2/opencv.hpp"
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include "Buffer.h"
 #include "EdgelDetector.h"
@@ -49,7 +50,12 @@ int main(int argc, char** argv) {
 		camera >> frame;
 		
 		buffer.setFrame(frame);
+
+		auto start = std::chrono::high_resolution_clock::now();
 		detector.findEdgels();
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+		std::cout << duration << "us\n";
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);

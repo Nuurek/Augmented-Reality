@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
 #include <algorithm>
+#include <chrono>
 #include "Buffer.h"
 #include "Edgel.h"
 
 
-const std::vector<float> GAUSSIAN_COEFFICIENTS = { -5.0, -3.0, 0.0, 3.0, 5.0 };
+const std::vector<int> GAUSSIAN_COEFFICIENTS = { -5, -3, 0, 3, 5 };
 const size_t BORDER_SIZE = GAUSSIAN_COEFFICIENTS.size() / 2;
 const size_t REGION_SIZE = 40;
 const size_t NUMBER_OF_CHANNELS = 3;
