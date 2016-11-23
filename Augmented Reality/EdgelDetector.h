@@ -21,7 +21,7 @@ class EdgelDetector {
 	static const size_t borderSize;
 	static const size_t regionSize;
 
-	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionRight, size_t regionBottom);
+	std::vector<Edgel> findEdgelsInRegion(size_t regionLeft, size_t regionTop, size_t regionWidth, size_t regionHeight);
 	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
 
 public:
