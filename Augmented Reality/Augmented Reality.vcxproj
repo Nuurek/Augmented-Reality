@@ -151,12 +151,14 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Edgel.cpp" />
     <ClCompile Include="EdgelDetector.cpp" />
+    <ClCompile Include="FrameDecorator.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Edgel.h" />
     <ClInclude Include="EdgelDetector.h" />
+    <ClInclude Include="FrameDecorator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

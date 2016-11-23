@@ -15,6 +15,9 @@ const char* WINDOW_NAME = "Camera capture";
 const bool WRITE_VIDEO = true;
 const char* WRITE_FILENAME = "capture.mpeg";
 
+const size_t BORDER_SIZE = 2;
+const size_t REGION_SIZE = 40;
+const size_t STEP_SIZE = 5;
 
 int exitWithError(const char * errorMessage) {
 	std::cerr << errorMessage << "\n";
@@ -43,7 +46,7 @@ int main(int argc, char** argv) {
 
 	cv::Mat frame;
 	Buffer buffer;
-	EdgelDetector detector;
+	EdgelDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	detector.setBuffer(&buffer);
 
 	while (true) {
@@ -52,7 +55,7 @@ int main(int argc, char** argv) {
 		buffer.setFrame(frame);
 
 		auto start = std::chrono::high_resolution_clock::now();
-		detector.findEdgels();
+		auto edgels = detector.findEdgels();
 		auto end = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		std::cout << duration << "us\n";

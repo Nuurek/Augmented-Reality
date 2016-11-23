@@ -1,6 +1,11 @@
 #include "EdgelDetector.h"
 
 
+EdgelDetector::EdgelDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize) :
+	BORDER_SIZE(borderSize), REGION_SIZE(regionSize), STEP_SIZE(stepSize)
+{
+}
+
 void EdgelDetector::setBuffer(Buffer* buffer) {
 	this->buffer = buffer;
 }
@@ -25,7 +30,7 @@ std::vector<Edgel> EdgelDetector::findEdgels() {
 
 			auto start = std::chrono::high_resolution_clock::now();
 			auto edgelsInRegion = findEdgelsInRegion(regionLeft, regionTop, regionWidth, regionHeight);
-			//edgels.insert(edgels.end(), edgelsInRegion.begin(), edgelsInRegion.end());
+			edgels.insert(edgels.end(), edgelsInRegion.begin(), edgelsInRegion.end());
 			auto end = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 			totalTime += duration;
