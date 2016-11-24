@@ -41,7 +41,8 @@ void ARMarkerDetector::findARMarkers() {
 			start = std::chrono::high_resolution_clock::now();
 
 			if (edgelsInRegion.size() > EDGELS_IN_REGION) {
-				auto lineSegments = lineSegmentDetector.findLineSegmentsInRegion(edgelsInRegion);
+				auto lineSegmentsInRegion = lineSegmentDetector.findLineSegmentsInRegion(edgelsInRegion);
+				lineSegments.insert(lineSegments.end(), lineSegmentsInRegion.begin(), lineSegmentsInRegion.end());
 			}
 
 			end = std::chrono::high_resolution_clock::now();
@@ -59,6 +60,11 @@ std::vector<Edgel> ARMarkerDetector::getEdgels() {
 	return edgels;
 }
 
+std::vector<LineSegment> ARMarkerDetector::getLineSegments() {
+	return lineSegments;
+}
+
 void ARMarkerDetector::clearStructures() {
 	edgels.clear();
+	lineSegments.clear();
 }

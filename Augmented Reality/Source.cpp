@@ -63,10 +63,12 @@ int main(int argc, char** argv) {
 		std::cout << duration << "us\n";
 
 		auto edgels = detector.getEdgels();
+		auto lineSegments = detector.getLineSegments();
 
-		decorator.drawRegionLines(frame);
-		decorator.drawSubRegionLines(frame);
+		//decorator.drawRegionLines(frame);
+		//decorator.drawSubRegionLines(frame);
 		decorator.drawEdgels(frame, edgels);
+		decorator.drawLineSegments(frame, lineSegments);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);

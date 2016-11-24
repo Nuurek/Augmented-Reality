@@ -11,8 +11,6 @@ void FrameDecorator::drawRegionLines(cv::Mat& frame) {
 			cv::Rect region(static_cast<int>(x), static_cast<int>(y), 
 				static_cast<int>(x + REGION_SIZE - 1), static_cast<int>(y + REGION_SIZE - 1));
 
-			cv::Scalar greenColor(0, 128, 0);
-
 			cv::rectangle(frame, region, greenColor, 2);
 		}
 	}
@@ -27,9 +25,7 @@ void FrameDecorator::drawSubRegionLines(cv::Mat& frame) {
 						static_cast<int>(regionLeft + x + STEP_SIZE - 1), 
 						static_cast<int>(regionTop + y + STEP_SIZE - 1));
 
-					cv::Scalar greenColor(128, 128, 128);
-
-					cv::rectangle(frame, subregion, greenColor);
+					cv::rectangle(frame, subregion, midGrayColor);
 				}
 			}
 		}
@@ -42,10 +38,29 @@ void FrameDecorator::drawEdgels(cv::Mat& frame, std::vector<Edgel> edgels) {
 	}
 }
 
+void FrameDecorator::drawLineSegments(cv::Mat & frame, std::vector<LineSegment> lineSegments) {
+	for (auto& lineSegment : lineSegments) {
+		drawLineSegment(frame, lineSegment);
+	}
+}
+
 void FrameDecorator::drawEdgel(cv::Mat & frame, Edgel & edgel) {
 	cv::Point center(static_cast<int>(edgel.position.x), static_cast<int>(edgel.position.y));
 
-	cv::Scalar blueColor(128, 0, 0);
-
 	cv::circle(frame, center, 1, blueColor, 2);
+}
+
+void FrameDecorator::drawLineSegment(cv::Mat & frame, LineSegment & lineSegment) {
+	auto& start = lineSegment.start;
+	auto& end = lineSegment.end;
+	auto& slope = lineSegment.slope;
+	cv::Point startPoint(static_cast<int>(start.position.x), static_cast<int>(start.position.y));
+	cv::Point endPoint(static_cast<int>(end.position.x), static_cast<int>(end.position.y));
+
+	cv::Point leftHead(end.position.x + 5.0f * (-slope.x + slope.y), end.position.y + 5.0f * (-slope.y - slope.x));
+	cv::Point rightHead(end.position.x + 5.0f * (-slope.x - slope.y), end.position.y + 5.0f * (-slope.y + slope.x));
+
+	cv::line(frame, endPoint, startPoint, yellowColor, 2);
+	cv::line(frame, endPoint, leftHead, redColor, 2);
+	cv::line(frame, endPoint, rightHead, redColor, 2);
 }

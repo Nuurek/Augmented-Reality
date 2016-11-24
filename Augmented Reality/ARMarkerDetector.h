@@ -23,5 +23,6 @@ public:
 	void findARMarkers();
 
 	std::vector<Edgel> getEdgels();
+	std::vector<LineSegment> getLineSegments();
 };
 
