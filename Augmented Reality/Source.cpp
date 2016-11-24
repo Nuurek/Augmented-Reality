@@ -5,6 +5,7 @@
 
 #include "Buffer.h"
 #include "ARMarkerDetector.h"
+#include "KeyManager.h"
 #include "FrameDecorator.h"
 
 
@@ -48,6 +49,9 @@ int main(int argc, char** argv) {
 	cv::Mat frame;
 	Buffer buffer;
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
+
+	KeyManager keyManager;
+
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
@@ -62,21 +66,34 @@ int main(int argc, char** argv) {
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		std::cout << duration << "us\n";
 
-		auto edgels = detector.getEdgels();
-		auto lineSegments = detector.getLineSegments();
+		if (keyManager.isActive("regions")) {
+			decorator.drawRegionLines(frame);
+		}
 
-		//decorator.drawRegionLines(frame);
-		//decorator.drawSubRegionLines(frame);
-		decorator.drawEdgels(frame, edgels);
-		decorator.drawLineSegments(frame, lineSegments);
+		if (keyManager.isActive("subRegions")) {
+			decorator.drawSubRegionLines(frame);
+		}
+
+		if (keyManager.isActive("edgels")) {
+			auto edgels = detector.getEdgels();
+			decorator.drawEdgels(frame, edgels);
+		}
+
+		if (keyManager.isActive("lineSegments")) {
+			auto lineSegments = detector.getLineSegments();
+			decorator.drawLineSegments(frame, lineSegments);
+		}
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
 
 		cv::imshow(WINDOW_NAME, frame);
-		if (cv::waitKey(1000 / FPS) >= 0) {
+		auto keyCode = cv::waitKey(1000 / FPS);
+		if (keyCode == 'q') {
 			return EXIT_SUCCESS;
+		} else {
+			keyManager.keyPressed(keyCode);
 		}
 	}
 }
