@@ -26,12 +26,16 @@ bool LineSegment::coincide(Edgel & edgel) {
 	return distanceFromPointToLine(start, end, edgel) < LINE_COINCIDENCE_DISTANCE;
 }
 
-Vector2f LineSegment::getLineSlope() {
+Vector2f LineSegment::getStartEndSlope() {
 	return start.position - end.position;
 }
 
 Vector2f LineSegment::getOrienation() {
 	return Vector2f(-start.slope.y, start.slope.x);
+}
+
+void LineSegment::swapEndPoints() {
+	std::swap(start, end);
 }
 
 

@@ -50,7 +50,7 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 			float startPointCoord = std::numeric_limits<float>::max();
 			float endPointCoord = 0;
 
-			const Vector2f slope = maximumLineSegment.getLineSlope();
+			const Vector2f slope = maximumLineSegment.getStartEndSlope();
 			const Vector2f orientation = maximumLineSegment.getOrienation();
 
 			if (fabs(slope.x) <= abs(slope.y)) {
@@ -79,6 +79,16 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 				}
 			}
 		}
+
+		if (dot(maximumLineSegment.getStartEndSlope(), maximumLineSegment.getOrienation()) < 0.0f) {
+			maximumLineSegment.swapEndPoints();
+		}
+
+		maximumLineSegment.slope = maximumLineSegment.getStartEndSlope().get_normalized();
+
+		lineSegments.push_back(maximumLineSegment);
+
+
 
 	} while (false);
 

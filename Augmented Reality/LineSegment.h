@@ -8,7 +8,6 @@ const float LINE_COINCIDENCE_DISTANCE = 0.75f;
 
 
 class LineSegment {
-	Vector2f slope;
 
 	std::vector<Edgel> supportEdgels;
 
@@ -16,6 +15,7 @@ class LineSegment {
 
 public:
 	Edgel start, end;
+	Vector2f slope;
 	
 	LineSegment() = default;
 	LineSegment(Edgel start, Edgel end);
@@ -24,7 +24,8 @@ public:
 	void addSupportEdgel(Edgel& edgel);
 	size_t numberOfSupportEdgels();
 	bool coincide(Edgel& edgel);
-	Vector2f getLineSlope();
+	Vector2f getStartEndSlope();
 	Vector2f getOrienation();
+	void swapEndPoints();
 };
 
