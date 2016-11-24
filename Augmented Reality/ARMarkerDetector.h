@@ -4,6 +4,8 @@
 #include "EdgelDetector.h"
 #include "LineSegment.h"
 #include "LineSegmentDetector.h"
+#include "LineSegmentMerger.h"
+
 
 const size_t EDGELS_IN_REGION = 5;
 
@@ -12,6 +14,8 @@ class ARMarkerDetector : public RegionBasedOperator {
 	std::vector<Edgel> edgels;
 	LineSegmentDetector lineSegmentDetector;
 	std::vector<LineSegment> lineSegments;
+	LineSegmentMerger lineSegmentMerger;
+	std::vector<LineSegment> mergedLineSegments;
 
 	void clearStructures();
 

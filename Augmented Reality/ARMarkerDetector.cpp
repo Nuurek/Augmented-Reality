@@ -40,14 +40,21 @@ void ARMarkerDetector::findARMarkers() {
 			//
 			start = std::chrono::high_resolution_clock::now();
 
+			std::vector<LineSegment> lineSegmentsInRegion;
 			if (edgelsInRegion.size() > EDGELS_IN_REGION) {
-				auto lineSegmentsInRegion = lineSegmentDetector.findLineSegmentsInRegion(edgelsInRegion);
+				lineSegmentsInRegion = lineSegmentDetector.findLineSegmentsInRegion(edgelsInRegion);
 				lineSegments.insert(lineSegments.end(), lineSegmentsInRegion.begin(), lineSegmentsInRegion.end());
 			}
 
 			end = std::chrono::high_resolution_clock::now();
 			duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 			findingLineSegments += duration;
+			//
+
+			//
+			if (lineSegmentsInRegion.size() > 1) {
+				auto mergedLineSegmentsInRegion = lineSegmentMerger.mergeLineSegments(lineSegmentsInRegion);
+			}
 			//
 		}
 	}
@@ -67,4 +74,5 @@ std::vector<LineSegment> ARMarkerDetector::getLineSegments() {
 void ARMarkerDetector::clearStructures() {
 	edgels.clear();
 	lineSegments.clear();
+	mergedLineSegments.clear();
 }
