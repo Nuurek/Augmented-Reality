@@ -1,9 +1,17 @@
 #pragma once
-#include "RegionBasedOperator.h"
 #include "Edgel.h"
+#include "LineSegment.h"
+#include <random>
 
-class LineSegmentDetector : public RegionBasedOperator {
+const size_t SEGMENT_SEARCH_ITERATIONS = 25;
+const size_t EDGELS_PAIRING_ITERATIONS = 100;
 
-public:
-	LineSegmentDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize);
+class LineSegmentDetector{
+	std::random_device randomDevice;
+	std::mt19937 randomGenerator{ randomDevice() };
+
+	bool isEdgelsPairFound(Edgel& start, Edgel& end, size_t iteration);
+
+public:	
+	std::vector<LineSegment> findLineSegmentsInRegion(std::vector<Edgel> edgels);
 };

@@ -153,6 +153,7 @@
     <ClCompile Include="Edgel.cpp" />
     <ClCompile Include="EdgelDetector.cpp" />
     <ClCompile Include="FrameDecorator.cpp" />
+    <ClCompile Include="LineSegment.cpp" />
     <ClCompile Include="LineSegmentDetector.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="Edgel.h" />
     <ClInclude Include="EdgelDetector.h" />
     <ClInclude Include="FrameDecorator.h" />
+    <ClInclude Include="LineSegment.h" />
     <ClInclude Include="LineSegmentDetector.h" />
     <ClInclude Include="RegionBasedOperator.h" />
   </ItemGroup>

@@ -1,12 +1,20 @@
 #pragma once
+#include <cmath>
+#define _USE_MATH_DEFINES
+
 #include "vector2f.h"
-//TODO: Implement vector2f or ideally use OpenGL class.
+
+const float ORIENTATION_DEGREE = 67.0f;
+const float ORIENTATION_THRESHOLD = cosf(ORIENTATION_DEGREE * static_cast<float>(M_PI) / 180.0f);
 
 struct Edgel {
 public:
+	Edgel() = default;
 	Edgel(size_t x, size_t y, Vector2f slope);
 
 	Vector2f position;
 	Vector2f slope;
+
+	bool isOrientationCompatible(Edgel& rhs);
 };
 

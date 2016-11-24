@@ -17,7 +17,7 @@ void ARMarkerDetector::findARMarkers() {
 	size_t maxWidth = width - BORDER_SIZE - 1;
 	size_t maxHeight = height - BORDER_SIZE - 1;
 
-	long long totalTime = 0;
+	long long findingEdgelsTime = 0, findingLineSegments = 0;
 
 	clearStructures();
 
@@ -26,6 +26,7 @@ void ARMarkerDetector::findARMarkers() {
 			size_t regionWidth = std::min(REGION_SIZE, maxWidth - regionLeft);
 			size_t regionHeight = std::min(REGION_SIZE, maxHeight - regionTop);
 
+			//
 			auto start = std::chrono::high_resolution_clock::now();
 
 			auto edgelsInRegion = edgelDetector.findEdgelsInRegion(regionLeft, regionTop, regionWidth, regionHeight);
@@ -33,11 +34,25 @@ void ARMarkerDetector::findARMarkers() {
 
 			auto end = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			totalTime += duration;
+			findingEdgelsTime += duration;
+			//
+
+			//
+			start = std::chrono::high_resolution_clock::now();
+
+			if (edgelsInRegion.size() > EDGELS_IN_REGION) {
+				auto lineSegments = lineSegmentDetector.findLineSegmentsInRegion(edgelsInRegion);
+			}
+
+			end = std::chrono::high_resolution_clock::now();
+			duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+			findingLineSegments += duration;
+			//
 		}
 	}
 
-	std::cout << "Calculating regions: " << totalTime << "us.\n";
+	std::cout << "Finding edgels: " << findingEdgelsTime << "us.\n";
+	std::cout << "Finding line segments: " << findingLineSegments << "us.\n";
 }
 
 std::vector<Edgel> ARMarkerDetector::getEdgels() {
