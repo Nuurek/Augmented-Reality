@@ -27,6 +27,57 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 				start = edgels[startIndex];
 				end = edgels[endIndex];
 			} while (!(isEdgelsPairFound(start, end, iteration++)));
+
+			if (iteration < EDGELS_PAIRING_ITERATIONS) {
+				LineSegment newLineSegment(start, end);
+
+				for (auto& edgel : edgels) {
+					if (newLineSegment.coincide(edgel)) {
+						newLineSegment.addSupportEdgel(edgel);
+					}
+				}
+
+				if (newLineSegment.numberOfSupportEdgels() > maximumLineSegment.numberOfSupportEdgels()) {
+					maximumLineSegment = newLineSegment;
+				}
+
+			} else {
+				continue; //TODO try to break searching if nothing has been found in first iteration
+			}
+		}
+
+		if (maximumLineSegment.numberOfSupportEdgels() >= MIN_EDGELS_PER_LINE) {
+			float startPointCoord = std::numeric_limits<float>::max();
+			float endPointCoord = 0;
+
+			const Vector2f slope = maximumLineSegment.getLineSlope();
+			const Vector2f orientation = maximumLineSegment.getOrienation();
+
+			if (fabs(slope.x) <= abs(slope.y)) {
+				for (auto edgel : edgels) {
+					if (edgel.position.y > endPointCoord) {
+						endPointCoord = edgel.position.y;
+						maximumLineSegment.start = edgel;
+					}
+
+					if (edgel.position.y < startPointCoord) {
+						startPointCoord = edgel.position.y;
+						maximumLineSegment.end = edgel;
+					}
+				}
+			} else {
+				for (auto edgel : edgels) {
+					if (edgel.position.x > endPointCoord) {
+						endPointCoord = edgel.position.x;
+						maximumLineSegment.start = edgel;
+					}
+
+					if (edgel.position.x < startPointCoord) {
+						startPointCoord = edgel.position.x;
+						maximumLineSegment.end = edgel;
+					}
+				}
+			}
 		}
 
 	} while (false);
