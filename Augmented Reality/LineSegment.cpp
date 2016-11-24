@@ -6,18 +6,6 @@ LineSegment::LineSegment(Edgel start, Edgel end)
 	slope = start.slope;
 }
 
-void LineSegment::clearSupportEdgels() {
-	supportEdgels.clear();
-}
-
-void LineSegment::addSupportEdgel(Edgel & edgel) {
-	supportEdgels.emplace_back(edgel);
-}
-
-size_t LineSegment::numberOfSupportEdgels() {
-	return supportEdgels.size();
-}
-
 bool LineSegment::coincide(Edgel & edgel) {
 	if (!start.isOrientationCompatible(edgel)) {
 		return false;

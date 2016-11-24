@@ -5,11 +5,14 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 	std::vector<LineSegment> lineSegments;
 	LineSegment maximumLineSegment;
 
-	size_t numberOfEdgels = edgels.size();
-	std::uniform_int_distribution<size_t> randomIndex(0, numberOfEdgels - 1);
+	size_t numberOfEdgels;
+	std::uniform_int_distribution<size_t> randomIndex;
 
 	do {
-		maximumLineSegment.clearSupportEdgels();
+		maximumLineSegment.supportEdgels.clear();
+
+		numberOfEdgels = edgels.size();
+		randomIndex = std::uniform_int_distribution<size_t>(0, numberOfEdgels - 1);
 
 		for (size_t i = 0; i < SEGMENT_SEARCH_ITERATIONS; i++) {
 			Edgel start;
@@ -33,11 +36,11 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 
 				for (auto& edgel : edgels) {
 					if (newLineSegment.coincide(edgel)) {
-						newLineSegment.addSupportEdgel(edgel);
+						newLineSegment.supportEdgels.push_back(edgel);
 					}
 				}
 
-				if (newLineSegment.numberOfSupportEdgels() > maximumLineSegment.numberOfSupportEdgels()) {
+				if (newLineSegment.supportEdgels.size() > maximumLineSegment.supportEdgels.size()) {
 					maximumLineSegment = newLineSegment;
 				}
 
@@ -46,7 +49,7 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 			}
 		}
 
-		if (maximumLineSegment.numberOfSupportEdgels() >= MIN_EDGELS_PER_LINE) {
+		if (maximumLineSegment.supportEdgels.size() >= MIN_EDGELS_PER_LINE) {
 			float startPointCoord = std::numeric_limits<float>::max();
 			float endPointCoord = 0;
 
@@ -88,9 +91,17 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 
 		lineSegments.push_back(maximumLineSegment);
 
+		//TODO: optimize erasing edgels.
+		for (auto& lineSegmentEdgel : maximumLineSegment.supportEdgels) {
+			for (std::vector<Edgel>::iterator it = edgels.begin(); it != edgels.end(); ++it) {
+				if (lineSegmentEdgel.isTheSamePoint((*it))) {
+					edgels.erase(it);
+					break;
+				}
+			}
+		}
 
-
-	} while (false);
+	} while (maximumLineSegment.supportEdgels.size() >= MIN_EDGELS_PER_LINE && edgels.size() >= MIN_EDGELS_PER_LINE);
 
 	return lineSegments;
 }

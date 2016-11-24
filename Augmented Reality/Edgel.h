@@ -16,5 +16,7 @@ public:
 	Vector2f slope;
 
 	bool isOrientationCompatible(Edgel& rhs);
+	bool isTheSamePoint(Edgel& rhs);
+	bool operator<(Edgel& rhs);
 };
 

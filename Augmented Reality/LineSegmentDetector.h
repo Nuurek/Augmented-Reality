@@ -3,6 +3,7 @@
 #include "LineSegment.h"
 #include <random>
 #include <limits>
+#include <set>
 
 const size_t SEGMENT_SEARCH_ITERATIONS = 25;
 const size_t EDGELS_PAIRING_ITERATIONS = 100;
