@@ -4,16 +4,16 @@
 LineSegmentMerger::LineSegmentMerger(const size_t borderSize, const size_t regionSize, const size_t stepSize) :
 	EdgelDetector(borderSize, regionSize, stepSize) {}
 
-std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSegment> lineSegmentsInRegion) {
+std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSegment> lineSegments) {
 	std::vector<LineWithDistance> linesWithDistance;
 
-	for (int i = 0; i < lineSegmentsInRegion.size(); i++) {
-		auto lineSegment = lineSegmentsInRegion[i];
+	for (int i = 0; i < lineSegments.size(); i++) {
+		auto lineSegment = lineSegments[i];
 
 		linesWithDistance.clear();
 
-		for (int j = 0; j < lineSegmentsInRegion.size(); j++) {
-			auto otherLineSegment = lineSegmentsInRegion[j];
+		for (int j = 0; j < lineSegments.size(); j++) {
+			auto otherLineSegment = lineSegments[j];
 			
 			if (i == j) {
 				continue;
@@ -42,6 +42,25 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 
 			const size_t length = static_cast<size_t>((endPoint - startPoint).get_length());
 			const Vector2f slope = (endPoint - startPoint).get_normalized();
+
+			if (isLineExtensible(startPoint, endPoint, slope, lineSegment.end.slope, length)) {
+				lineSegment.end = closeLine.end;
+				lineSegment.slope = (lineSegment.end.position - lineSegment.start.position).get_normalized();
+
+				closeLine.isMerged = true;
+			} else {
+				break;
+			}
+		}
+
+		size_t oldSize = lineSegments.size();
+
+		lineSegments.erase(std::remove_if(lineSegments.begin(), lineSegments.end(), [](LineSegment& segment) {
+			return segment.isMerged;
+		}), lineSegments.end());
+
+		if (lineSegments.size() < oldSize) {
+			i = -1;
 		}
 	}
 

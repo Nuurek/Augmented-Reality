@@ -38,6 +38,6 @@ class LineSegmentMerger : public EdgelDetector {
 public:
 	LineSegmentMerger(const size_t borderSize, const size_t regionSize, const size_t stepSize);
 	
-	std::vector<LineSegment> mergeLineSegments(std::vector<LineSegment> lineSegmentsInRegion);
+	std::vector<LineSegment> mergeLineSegments(std::vector<LineSegment> lineSegments);
 };
 
