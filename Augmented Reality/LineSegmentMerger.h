@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "RegionBasedOperator.h"
 #include "EdgelDetector.h"
 #include "LineSegment.h"
@@ -12,6 +14,8 @@ const size_t MERGE_ITERATIONS = 50;
 
 
 class LineSegmentMerger : public EdgelDetector {
+	using IndexedLineDistance = std::tuple<size_t, float>;
+
 	bool orientationAndDirectionCompatible(LineSegment& first, LineSegment& second);
 
 public:
