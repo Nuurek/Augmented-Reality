@@ -25,6 +25,12 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 				}
 			}
 		}
+
+		if (indexLineDistances.size() == 0) {
+			continue;
+		}
+
+		std::sort(indexLineDistances.begin(), indexLineDistances.end());
 	}
 
 	return std::vector<LineSegment>();

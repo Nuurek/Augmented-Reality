@@ -12,10 +12,19 @@ const float LENGTH_THRESHOLD = 25.0f;
 const float SQUARED_LENGTH_THRESHOLD = LENGTH_THRESHOLD * LENGTH_THRESHOLD;
 const size_t MERGE_ITERATIONS = 50;
 
+struct IndexedLineDistance {
+	size_t index;
+	float distance;
+
+	IndexedLineDistance(size_t index, float distance) :
+		index(index), distance(distance) { }
+
+	inline bool operator<(IndexedLineDistance& rhs) {
+		return distance < rhs.distance;
+	}
+};
 
 class LineSegmentMerger : public EdgelDetector {
-	using IndexedLineDistance = std::tuple<size_t, float>;
-
 	bool orientationAndDirectionCompatible(LineSegment& first, LineSegment& second);
 
 public:

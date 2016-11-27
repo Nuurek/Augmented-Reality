@@ -54,6 +54,11 @@ void ARMarkerDetector::findARMarkers() {
 			//
 
 			//
+			/* 
+				TODO: Right now line segments are merged firstly in the region and then globally
+				what can result in a lot of compares in global phase. 
+				We could enlarge merge region iteratively instead.
+			*/
 			if (lineSegmentsInRegion.size() > 1) {
 				auto mergedLineSegmentsInRegion = lineSegmentMerger.mergeLineSegments(lineSegmentsInRegion);
 			}
