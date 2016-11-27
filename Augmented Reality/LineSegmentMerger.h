@@ -11,7 +11,7 @@ const float SQUARED_LENGTH_THRESHOLD = LENGTH_THRESHOLD * LENGTH_THRESHOLD;
 const size_t MERGE_ITERATIONS = 50;
 
 
-class LineSegmentMerger : public RegionBasedOperator, EdgelDetector {
+class LineSegmentMerger : public EdgelDetector {
 	bool orientationAndDirectionCompatible(LineSegment& first, LineSegment& second);
 
 public:

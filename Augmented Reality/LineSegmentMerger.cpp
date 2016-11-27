@@ -2,7 +2,7 @@
 
 
 LineSegmentMerger::LineSegmentMerger(const size_t borderSize, const size_t regionSize, const size_t stepSize) :
-	RegionBasedOperator(borderSize, regionSize, stepSize) {}
+	EdgelDetector(borderSize, regionSize, stepSize) {}
 
 std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSegment> lineSegmentsInRegion) {
 	for (int i = 0; i < lineSegmentsInRegion.size(); i++) {

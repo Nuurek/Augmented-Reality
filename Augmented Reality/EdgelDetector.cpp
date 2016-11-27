@@ -101,7 +101,7 @@ std::vector<Edgel> EdgelDetector::iterateOverDimensions(size_t regionLeft, size_
 
 unsigned char * EdgelDetector::calcualteOffset(size_t x, size_t y) const {
 	auto width = buffer->getWidth();
-	return buffer->getData + (y * width + x) * NUMBER_OF_CHANNELS;
+	return buffer->getData() + (y * width + x) * NUMBER_OF_CHANNELS;
 }
 
 
