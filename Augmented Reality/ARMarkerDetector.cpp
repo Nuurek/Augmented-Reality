@@ -61,6 +61,7 @@ void ARMarkerDetector::findARMarkers() {
 			*/
 			if (lineSegmentsInRegion.size() > 1) {
 				auto mergedLineSegmentsInRegion = lineSegmentMerger.mergeLineSegments(lineSegmentsInRegion);
+				mergedLineSegments.insert(mergedLineSegments.end(), mergedLineSegmentsInRegion.begin(), mergedLineSegmentsInRegion.end());
 			}
 			//
 		}
@@ -68,6 +69,13 @@ void ARMarkerDetector::findARMarkers() {
 
 	std::cout << "Finding edgels: " << findingEdgelsTime << "us.\n";
 	std::cout << "Finding line segments: " << findingLineSegments << "us.\n";
+
+	std::cout << "Line segments in regions: " << lineSegments.size() << "\n";
+	std::cout << "Merged line segments in regions: " << mergedLineSegments.size() << "\n";
+
+	mergedLineSegments = lineSegmentMerger.mergeLineSegments(mergedLineSegments);
+
+	std::cout << "Merged line segments: " << mergedLineSegments.size() << "\n";
 }
 
 std::vector<Edgel> ARMarkerDetector::getEdgels() {
