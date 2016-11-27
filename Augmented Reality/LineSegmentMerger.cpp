@@ -34,8 +34,14 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 
 		std::sort(linesWithDistance.begin(), linesWithDistance.end());
 
-		for (auto& closeSegment : linesWithDistance) {
+		for (auto& lineWithDistance : linesWithDistance) {
+			auto& closeLine = lineWithDistance.lineSegment;
+
 			const Vector2f startPoint = lineSegment.end.position;
+			Vector2f endPoint = closeLine.start.position;
+
+			const size_t length = static_cast<size_t>((endPoint - startPoint).get_length());
+			const Vector2f slope = (endPoint - startPoint).get_normalized();
 		}
 	}
 

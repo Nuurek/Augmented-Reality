@@ -8,15 +8,14 @@ const float LINE_COINCIDENCE_DISTANCE = 0.75f;
 
 
 class LineSegment {
-
-
 	float distanceFromPointToLine(Edgel& start, Edgel& end, Edgel& point) const;
 
 public:
 	Edgel start, end;
 	Vector2f slope;
 	std::vector<Edgel> supportEdgels;
-	
+	bool isMerged = false;
+
 	LineSegment() = default;
 	LineSegment(Edgel start, Edgel end);
 
