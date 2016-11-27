@@ -12,15 +12,21 @@ const float LENGTH_THRESHOLD = 25.0f;
 const float SQUARED_LENGTH_THRESHOLD = LENGTH_THRESHOLD * LENGTH_THRESHOLD;
 const size_t MERGE_ITERATIONS = 50;
 
-struct IndexedLineDistance {
-	size_t index;
+struct LineWithDistance {
+	LineSegment& lineSegment;
 	float distance;
 
-	IndexedLineDistance(size_t index, float distance) :
-		index(index), distance(distance) { }
+	LineWithDistance(LineSegment& lineSegment, float distance) :
+		lineSegment(lineSegment), distance(distance) { }
 
-	inline bool operator<(IndexedLineDistance& rhs) {
+	inline bool operator<(LineWithDistance& rhs) {
 		return distance < rhs.distance;
+	}
+
+	inline LineWithDistance& operator=(LineWithDistance& rhs) {
+		lineSegment = rhs.lineSegment;
+		distance = rhs.distance;
+		return *this;
 	}
 };
 

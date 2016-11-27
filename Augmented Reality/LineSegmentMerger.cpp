@@ -5,10 +5,12 @@ LineSegmentMerger::LineSegmentMerger(const size_t borderSize, const size_t regio
 	EdgelDetector(borderSize, regionSize, stepSize) {}
 
 std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSegment> lineSegmentsInRegion) {
-	std::vector<IndexedLineDistance> indexLineDistances;
+	std::vector<LineWithDistance> linesWithDistance;
 
 	for (int i = 0; i < lineSegmentsInRegion.size(); i++) {
 		auto lineSegment = lineSegmentsInRegion[i];
+
+		linesWithDistance.clear();
 
 		for (int j = 0; j < lineSegmentsInRegion.size(); j++) {
 			auto otherLineSegment = lineSegmentsInRegion[j];
@@ -21,16 +23,20 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 				const float squaredLength = (otherLineSegment.start.position - lineSegment.end.position).get_squared_length();
 
 				if (squaredLength < SQUARED_LENGTH_THRESHOLD) {
-					indexLineDistances.emplace_back(IndexedLineDistance(j, squaredLength));
+					linesWithDistance.emplace_back(LineWithDistance(otherLineSegment, squaredLength));
 				}
 			}
 		}
 
-		if (indexLineDistances.size() == 0) {
+		if (linesWithDistance.size() == 0) {
 			continue;
 		}
 
-		std::sort(indexLineDistances.begin(), indexLineDistances.end());
+		std::sort(linesWithDistance.begin(), linesWithDistance.end());
+
+		for (auto& closeSegment : linesWithDistance) {
+			const Vector2f startPoint = lineSegment.end.position;
+		}
 	}
 
 	return std::vector<LineSegment>();

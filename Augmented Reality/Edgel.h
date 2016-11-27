@@ -15,6 +15,10 @@ public:
 	Vector2f position;
 	Vector2f slope;
 
+	inline bool operator==(Edgel& rhs) const {
+		return position == rhs.position && slope == rhs.slope;
+	}
+
 	bool isOrientationCompatible(Edgel& rhs);
 	bool isTheSamePoint(Edgel& rhs);
 	bool operator<(Edgel& rhs);
