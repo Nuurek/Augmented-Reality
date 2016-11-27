@@ -3,11 +3,13 @@
 
 ARMarkerDetector::ARMarkerDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize)
 	: RegionBasedOperator(borderSize, regionSize, stepSize),
-	edgelDetector(borderSize, regionSize, stepSize) {}
+	edgelDetector(borderSize, regionSize, stepSize),
+	lineSegmentMerger(borderSize, regionSize, stepSize) {}
 
 void ARMarkerDetector::setBuffer(Buffer * buffer) {
 	RegionBasedOperator::setBuffer(buffer);
 	edgelDetector.setBuffer(buffer);
+	lineSegmentMerger.setBuffer(buffer);
 }
 
 void ARMarkerDetector::findARMarkers() {

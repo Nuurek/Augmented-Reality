@@ -12,9 +12,13 @@ const size_t NUMBER_OF_CHANNELS = 3;
 const size_t KERNEL_THRESHOLD = 255;
 
 class EdgelDetector : public RegionBasedOperator {
+protected:
 	std::vector<Edgel> iterateOverDimensions(size_t regionLeft, size_t regionTop, size_t firstLimit, size_t secondLimit, size_t pitch,
 		std::function<size_t()> pixelPosition, std::function<Edgel()> createEdgel);
+	unsigned char* calcualteOffset(size_t x, size_t y) const;
 	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
+	unsigned int edgeKernelX(size_t x, size_t y) const ;
+	unsigned int edgeKernelY(size_t x, size_t y) const;
 	Vector2f edgelGradientIntensity(size_t x, size_t y) const;
 
 	long long numberOfIterations;

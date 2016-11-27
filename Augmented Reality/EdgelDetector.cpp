@@ -99,6 +99,11 @@ std::vector<Edgel> EdgelDetector::iterateOverDimensions(size_t regionLeft, size_
 	return std::vector<Edgel>();
 }
 
+unsigned char * EdgelDetector::calcualteOffset(size_t x, size_t y) const {
+	auto width = buffer->getWidth();
+	return buffer->getData + (y * width + x) * NUMBER_OF_CHANNELS;
+}
+
 
 
 unsigned int EdgelDetector::edgeKernel(unsigned char* offset, size_t pitch) const {
@@ -108,6 +113,16 @@ unsigned int EdgelDetector::edgeKernel(unsigned char* offset, size_t pitch) cons
 	kernel += 3 * offset[2 * pitch];
 
 	return abs(kernel);
+}
+
+unsigned int EdgelDetector::edgeKernelX(size_t x, size_t y) const {
+	size_t pitch = buffer->getWidth() * NUMBER_OF_CHANNELS;
+	return edgeKernel(calcualteOffset(x, y), pitch);
+}
+
+unsigned int EdgelDetector::edgeKernelY(size_t x, size_t y) const {
+	size_t pitch = NUMBER_OF_CHANNELS;
+	return edgeKernel(calcualteOffset(x, y), pitch);
 }
 
 Vector2f EdgelDetector::edgelGradientIntensity(size_t x, size_t y) const {
