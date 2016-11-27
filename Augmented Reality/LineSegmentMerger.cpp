@@ -16,7 +16,7 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 				const float squaredLength = (otherLineSegment.start.position - lineSegment.end.position).get_squared_length();
 
 				if (squaredLength < SQUARED_LENGTH_THRESHOLD) {
-
+					
 				}
 			}
 		}
