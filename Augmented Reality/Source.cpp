@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 
+#include "Drawer.h"
 #include "Buffer.h"
 #include "ARMarkerDetector.h"
 #include "KeyManager.h"
@@ -44,7 +45,9 @@ int main(int argc, char** argv) {
 		cv::resize(exampleImage, exampleImage, cv::Size(FRAME_WIDTH, FRAME_HEIGHT));
 	}
 
-	cv::namedWindow(WINDOW_NAME);
+	//cv::namedWindow(WINDOW_NAME);
+	Drawer drawer;
+	drawer.init();
 
 	auto videoWriter = cv::VideoWriter();
 	if (WRITE_VIDEO) {
@@ -62,11 +65,12 @@ int main(int argc, char** argv) {
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
 	KeyManager keyManager;
+	keyManager.init(drawer.getWindow());
 
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
-
-	while (true) {
+	bool isRunning=true;
+	while (isRunning) {
 		if (USE_CAMERA) {
 			camera >> frame;
 		} else {
@@ -76,10 +80,15 @@ int main(int argc, char** argv) {
 		buffer.setFrame(frame);
 
 		auto start = std::chrono::high_resolution_clock::now();
-		detector.findARMarkers();
+		/*try {
+			detector.findARMarkers();
+		}
+		catch (int e) {
+			std::cout << "An exception occurred. Exception Nr. " << e << '\n';
+		}*/
 		auto end = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-		std::cout << duration << "us\n";
+		//std::cout << duration << "us\n";
 
 		if (keyManager.isActive("regions")) {
 			decorator.drawRegionLines(frame);
@@ -99,16 +108,18 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, lineSegments);
 		}
 
+		if (keyManager.isActive("escape")) {
+			isRunning = false;
+		}
+
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
 
-		cv::imshow(WINDOW_NAME, frame);
-		auto keyCode = cv::waitKey(1000 / FPS);
-		if (keyCode == 'q') {
-			return EXIT_SUCCESS;
-		} else {
-			keyManager.keyPressed(keyCode);
-		}
+		//cv::imshow(WINDOW_NAME, frame);
+		drawer.drawScene();
+		keyManager.handleEvents();
 	}
+
+	return EXIT_SUCCESS;
 }
