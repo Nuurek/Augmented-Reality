@@ -68,7 +68,7 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 }
 
 bool LineSegmentMerger::orientationAndDirectionCompatible(LineSegment & first, LineSegment & second) {
-	return dot(first.slope, second.slope) > COMMON_ORIENTATION_THRESHOLD &&
+	return dot(second.slope, first.slope) > COMMON_ORIENTATION_THRESHOLD &&
 		dot((second.end.position - first.start.position).get_normalized(), first.slope) > COMMON_ORIENTATION_THRESHOLD;
 }
 

@@ -14,6 +14,9 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
+const bool USE_CAMERA = false;
+const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
+
 const bool WRITE_VIDEO = true;
 const char* WRITE_FILENAME = "capture.mpeg";
 
@@ -27,10 +30,18 @@ int exitWithError(const char * errorMessage) {
 }
 
 int main(int argc, char** argv) {
-	auto camera = cv::VideoCapture(0);
+	cv::VideoCapture camera;
+	cv::Mat exampleImage;
 
-	if (!camera.isOpened()) {
-		return exitWithError("Couldn't open camera.");
+	if (USE_CAMERA) {
+		camera = cv::VideoCapture(0);
+
+		if (!camera.isOpened()) {
+			return exitWithError("Couldn't open camera.");
+		}
+	} else {
+		exampleImage = cv::imread(EXAMPLE_IMAGE_FILENAME);
+		cv::resize(exampleImage, exampleImage, cv::Size(FRAME_WIDTH, FRAME_HEIGHT));
 	}
 
 	cv::namedWindow(WINDOW_NAME);
@@ -56,7 +67,11 @@ int main(int argc, char** argv) {
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
 	while (true) {
-		camera >> frame;
+		if (USE_CAMERA) {
+			camera >> frame;
+		} else {
+			frame = exampleImage.clone();
+		}
 		
 		buffer.setFrame(frame);
 
