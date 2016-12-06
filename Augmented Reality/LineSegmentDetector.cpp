@@ -5,7 +5,7 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 	std::vector<LineSegment> lineSegments;
 	LineSegment maximumLineSegment;
 
-	size_t numberOfEdgels;
+	size_t numberOfEdgels = edgels.size();
 	std::uniform_int_distribution<size_t> randomIndex;
 
 	do {
@@ -53,7 +53,7 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 			float startPointCoord = std::numeric_limits<float>::max();
 			float endPointCoord = 0;
 
-			const Vector2f slope = maximumLineSegment.getStartEndSlope();
+			const Vector2f slope = maximumLineSegment.start.position - maximumLineSegment.end.position;
 			const Vector2f orientation = maximumLineSegment.getOrienation();
 
 			if (fabs(slope.x) <= abs(slope.y)) {
@@ -107,5 +107,5 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 }
 
 bool LineSegmentDetector::isEdgelsPairFound(Edgel & start, Edgel & end, size_t iteration) {
-	return start.isOrientationCompatible(end) || iteration > EDGELS_PAIRING_ITERATIONS;
+	return !((start == end ||	!start.isOrientationCompatible(end)) && iteration < EDGELS_PAIRING_ITERATIONS);
 }

@@ -7,13 +7,15 @@ LineSegmentMerger::LineSegmentMerger(const size_t borderSize, const size_t regio
 std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSegment> lineSegments) {
 	std::vector<LineWithDistance> linesWithDistance;
 
+	auto size = lineSegments.size();
+
 	for (int i = 0; i < lineSegments.size(); i++) {
 		auto lineSegment = lineSegments[i];
 
 		linesWithDistance.clear();
 
 		for (int j = 0; j < lineSegments.size(); j++) {
-			auto otherLineSegment = lineSegments[j];
+			auto& otherLineSegment = lineSegments[j];
 			
 			if (i == j) {
 				continue;
@@ -23,9 +25,12 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 				const float squaredLength = (otherLineSegment.start.position - lineSegment.end.position).get_squared_length();
 
 				if (squaredLength < SQUARED_LENGTH_THRESHOLD) {
-					linesWithDistance.emplace_back(LineWithDistance(otherLineSegment, squaredLength));
+					//linesWithDistance.emplace_back(LineWithDistance(otherLineSegment, squaredLength));
+					linesWithDistance.push_back(LineWithDistance(otherLineSegment, squaredLength));
 				}
 			}
+
+			linesWithDistance.size();
 		}
 
 		if (linesWithDistance.size() == 0) {
