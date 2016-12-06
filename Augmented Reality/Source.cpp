@@ -104,6 +104,11 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, mergedLineSegments);
 		}
 
+		if (keyManager.isActive("extendedLineSegments")) {
+			auto extendedLineSegments = detector.getExtendedLineSegments();
+			decorator.drawLineSegments(frame, extendedLineSegments);
+		}
+
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}

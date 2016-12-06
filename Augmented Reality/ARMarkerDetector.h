@@ -5,6 +5,7 @@
 #include "LineSegment.h"
 #include "LineSegmentDetector.h"
 #include "LineSegmentMerger.h"
+#include "LineSegmentExtender.h"
 
 
 const size_t EDGELS_IN_REGION = 5;
@@ -16,6 +17,8 @@ class ARMarkerDetector : public RegionBasedOperator {
 	std::vector<LineSegment> lineSegments;
 	LineSegmentMerger lineSegmentMerger;
 	std::vector<LineSegment> mergedLineSegments;
+	LineSegmentExtender lineSegmentExtender;
+	std::vector<LineSegment> extendedLineSegments;
 
 	void clearStructures();
 
@@ -29,5 +32,6 @@ public:
 	std::vector<Edgel> getEdgels();
 	std::vector<LineSegment> getLineSegments();
 	std::vector<LineSegment> getMergedLineSegments();
+	std::vector<LineSegment> getExtendedLineSegments();
 };
 

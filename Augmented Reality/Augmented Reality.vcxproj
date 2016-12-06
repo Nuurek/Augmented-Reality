@@ -156,6 +156,7 @@
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="LineSegment.cpp" />
     <ClCompile Include="LineSegmentDetector.cpp" />
+    <ClCompile Include="LineSegmentExtender.cpp" />
     <ClCompile Include="LineSegmentMerger.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LineSegment.h" />
     <ClInclude Include="LineSegmentDetector.h" />
+    <ClInclude Include="LineSegmentExtender.h" />
     <ClInclude Include="LineSegmentMerger.h" />
     <ClInclude Include="RegionBasedOperator.h" />
   </ItemGroup>

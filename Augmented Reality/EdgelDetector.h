@@ -19,6 +19,14 @@ protected:
 	unsigned int edgeKernel(unsigned char* offset, size_t pitch) const;
 	unsigned int edgeKernelX(size_t x, size_t y) const ;
 	unsigned int edgeKernelY(size_t x, size_t y) const;
+	inline bool isPointInFrame(float x, float y) const {
+		return (
+			x < BORDER_SIZE ||
+			x > buffer->getWidth() - BORDER_SIZE ||
+			y < BORDER_SIZE ||
+			y > buffer->getHeight() - BORDER_SIZE
+			);
+	}
 	Vector2f edgelGradientIntensity(size_t x, size_t y) const;
 
 	long long numberOfIterations;

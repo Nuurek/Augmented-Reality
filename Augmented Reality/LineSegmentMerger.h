@@ -31,6 +31,7 @@ struct LineWithDistance {
 };
 
 class LineSegmentMerger : public EdgelDetector {
+protected:
 	bool orientationAndDirectionCompatible(LineSegment& first, LineSegment& second);
 	bool isLineExtensible(Vector2f startPoint, Vector2f& endPoint, const Vector2f slope, const Vector2f gradient, const size_t maxLength);
 	bool isGradientIntensive(Vector2f startPoint, Vector2f normal, Vector2f gradient) const;

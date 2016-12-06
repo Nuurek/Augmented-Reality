@@ -10,7 +10,8 @@ class KeyManager {
 		{'2', "subRegions"},
 		{'3', "edgels"},
 		{'4', "lineSegments"},
-		{'5', "mergedLineSegments"}
+		{'5', "mergedLineSegments"},
+		{'6', "extendedLineSegments"}
 	};
 
 public:

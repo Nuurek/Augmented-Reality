@@ -4,12 +4,14 @@
 ARMarkerDetector::ARMarkerDetector(const size_t borderSize, const size_t regionSize, const size_t stepSize)
 	: RegionBasedOperator(borderSize, regionSize, stepSize),
 	edgelDetector(borderSize, regionSize, stepSize),
-	lineSegmentMerger(borderSize, regionSize, stepSize) {}
+	lineSegmentMerger(borderSize, regionSize, stepSize),
+	lineSegmentExtender(borderSize, regionSize, stepSize) {}
 
 void ARMarkerDetector::setBuffer(Buffer * buffer) {
 	RegionBasedOperator::setBuffer(buffer);
 	edgelDetector.setBuffer(buffer);
 	lineSegmentMerger.setBuffer(buffer);
+	lineSegmentExtender.setBuffer(buffer);
 }
 
 void ARMarkerDetector::findARMarkers() {
@@ -77,6 +79,8 @@ void ARMarkerDetector::findARMarkers() {
 	mergedLineSegments = lineSegmentMerger.mergeLineSegments(mergedLineSegments);
 
 	std::cout << "Merged line segments: " << mergedLineSegments.size() << "\n";
+
+	extendedLineSegments = lineSegmentExtender.extendLineSegments(mergedLineSegments);
 }
 
 std::vector<Edgel> ARMarkerDetector::getEdgels() {
@@ -89,6 +93,10 @@ std::vector<LineSegment> ARMarkerDetector::getLineSegments() {
 
 std::vector<LineSegment> ARMarkerDetector::getMergedLineSegments() {
 	return mergedLineSegments;
+}
+
+std::vector<LineSegment> ARMarkerDetector::getExtendedLineSegments() {
+	return extendedLineSegments;
 }
 
 void ARMarkerDetector::clearStructures() {
