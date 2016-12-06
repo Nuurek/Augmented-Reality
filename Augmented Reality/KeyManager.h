@@ -9,7 +9,8 @@ class KeyManager {
 		{'1', "regions"},
 		{'2', "subRegions"},
 		{'3', "edgels"},
-		{'4', "lineSegments"}
+		{'4', "lineSegments"},
+		{'5', "mergedLineSegments"}
 	};
 
 public:

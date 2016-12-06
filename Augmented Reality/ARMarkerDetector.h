@@ -28,5 +28,6 @@ public:
 
 	std::vector<Edgel> getEdgels();
 	std::vector<LineSegment> getLineSegments();
+	std::vector<LineSegment> getMergedLineSegments();
 };
 

@@ -99,6 +99,11 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, lineSegments);
 		}
 
+		if (keyManager.isActive("mergedLineSegments")) {
+			auto mergedLineSegments = detector.getMergedLineSegments();
+			decorator.drawLineSegments(frame, mergedLineSegments);
+		}
+
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}

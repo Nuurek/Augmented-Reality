@@ -87,6 +87,10 @@ std::vector<LineSegment> ARMarkerDetector::getLineSegments() {
 	return lineSegments;
 }
 
+std::vector<LineSegment> ARMarkerDetector::getMergedLineSegments() {
+	return mergedLineSegments;
+}
+
 void ARMarkerDetector::clearStructures() {
 	edgels.clear();
 	lineSegments.clear();
