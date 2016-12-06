@@ -64,7 +64,7 @@ std::vector<LineSegment> LineSegmentMerger::mergeLineSegments(std::vector<LineSe
 		}
 	}
 
-	return std::vector<LineSegment>();
+	return lineSegments;
 }
 
 bool LineSegmentMerger::orientationAndDirectionCompatible(LineSegment & first, LineSegment & second) {
