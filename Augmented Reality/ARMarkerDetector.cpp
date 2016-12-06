@@ -68,6 +68,7 @@ void ARMarkerDetector::findARMarkers() {
 	}
 
 	std::cout << "Finding edgels: " << findingEdgelsTime << "us.\n";
+	std::cout << "Edgels: " << edgels.size() << "\n";
 	std::cout << "Finding line segments: " << findingLineSegments << "us.\n";
 
 	std::cout << "Line segments in regions: " << lineSegments.size() << "\n";

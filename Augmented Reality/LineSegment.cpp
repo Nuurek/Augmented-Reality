@@ -15,7 +15,7 @@ bool LineSegment::coincide(Edgel & edgel) {
 }
 
 Vector2f LineSegment::getStartEndSlope() {
-	return start.position - end.position;
+	return end.position - start.position;
 }
 
 Vector2f LineSegment::getOrienation() {
