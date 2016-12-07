@@ -27,14 +27,11 @@ std::vector<LineSegment> LineSegmentExtender::findLinesWithCorners(std::vector<L
 
 
 bool LineSegmentExtender::isLineSegmentWithBorder(LineSegment& lineSegment) const {
-	bool isStartWhite = false;
-	bool isEndWhite = false;
-	
-	const size_t dx = static_cast<size_t>(lineSegment.slope.x * DELTA_MULTIPLIER);
-	const size_t dy = static_cast<size_t>(lineSegment.slope.y * DELTA_MULTIPLIER);
+	const int dx = static_cast<int>(lineSegment.slope.x * DELTA_MULTIPLIER);
+	const int dy = static_cast<int>(lineSegment.slope.y * DELTA_MULTIPLIER);
 
-	size_t x = lineSegment.start.position.x - dx;
-	size_t y = lineSegment.start.position.y - dy;
+	int x = lineSegment.start.position.x - dx;
+	int y = lineSegment.start.position.y - dy;
 
 	if (isPointInsideFrame(x, y)) {
 		if (isPixelWhite(x, y)) {
