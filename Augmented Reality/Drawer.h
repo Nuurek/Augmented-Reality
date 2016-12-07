@@ -2,6 +2,7 @@
 #include "ShaderProgram.h"
 #include "Teapot.h"
 #include "Model.h"
+#include "Quad.h"
 #include "Cube.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -22,7 +23,7 @@ public:
 	GLFWwindow* getWindow();
 	
 private:
-	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM);
+	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM, Models::Model object);
 	void initOpenGLProgram(GLFWwindow * window);
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
@@ -33,12 +34,11 @@ private:
 	GLuint currentFrameTex;
 
 	ShaderProgram *shaderProgram;
+	ShaderProgram *backgroundShaderProgram;
 	GLuint vao;
-	GLuint bufVertices; //Uchwyt na bufor VBO przechowuj¹cy tablicê wspó³rzêdnych wierzcho³ków
-	GLuint bufColors;  //Uchwyt na bufor VBO przechowuj¹cy tablicê kolorów
-	GLuint bufNormals; //Uchwyt na bufor VBO przechowuj¹cy tablickê wektorów normalnych
-	GLuint bufTexCoords;
+	GLuint backgroundVAO;
 	Models::Model model = Models::teapot;
+	Models::Model backgroundModel = Models::quad;
 	const float PI = 3.141592653589793f; 
 	GLFWwindow* window;
 	float aspectRatio = 4.f/3.f;

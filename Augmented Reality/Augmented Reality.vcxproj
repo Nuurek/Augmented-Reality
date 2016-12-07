@@ -166,6 +166,7 @@
     <ClCompile Include="LineSegmentDetector.cpp" />
     <ClCompile Include="LineSegmentMerger.cpp" />
     <ClCompile Include="lodepng.cpp" />
+    <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -185,11 +186,14 @@
     <ClInclude Include="LineSegmentMerger.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Quad.h" />
     <ClInclude Include="RegionBasedOperator.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Teapot.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="backgroundFshader.frag" />
+    <None Include="backgroundVshader.vert" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

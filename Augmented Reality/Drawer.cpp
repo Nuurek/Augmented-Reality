@@ -56,13 +56,19 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który nale¿y wykonaæ raz, na pocz¹tku programu************
 	glClearColor(0, 0, 1, 1); //Czyœæ ekran na czarno	
 	glEnable(GL_DEPTH_TEST); //W³¹cz u¿ywanie Z-Bufora
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_POINT_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
 
 
-	shaderProgram = new ShaderProgram("vshader.vert", NULL, "fshader.frag"); //Wczytaj program cieniuj¹cy 
+	GLuint bufVertices; //Uchwyt na bufor VBO przechowuj¹cy tablicê wspó³rzêdnych wierzcho³ków
+	GLuint bufColors;  //Uchwyt na bufor VBO przechowuj¹cy tablicê kolorów
+	GLuint bufNormals; //Uchwyt na bufor VBO przechowuj¹cy tablickê wektorów normalnych
+	GLuint bufTexCoords;
 
-
-																		   //*****Przygotowanie do rysowania pojedynczego obiektu*******
-																		   //Zbuduj VBO z danymi obiektu do narysowania
+	shaderProgram = new ShaderProgram("vshader.vert", NULL, "fshader.frag"); //Wczytaj program cieniuj¹cy
+	backgroundShaderProgram = new ShaderProgram("backgroundVshader.vert", NULL, "backgroundFshader.frag");												   //*****Przygotowanie do rysowania pojedynczego obiektu*******
+		//model																	   //Zbuduj VBO z danymi obiektu do narysowania
 	bufVertices = makeBuffer(model.vertices, model.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków
 	bufColors = makeBuffer(model.colors, model.vertexCount, sizeof(float) * 4);//VBO z kolorami wierzcho³ków
 	bufNormals = makeBuffer(model.normals, model.vertexCount, sizeof(float) * 4);//VBO z wektorami normalnymi wierzcho³ków
@@ -77,8 +83,36 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	assignVBOtoAttribute(shaderProgram, "normal", bufNormals, 4); //"normal" odnosi siê do deklaracji "in vec4 normal;" w vertex shaderze
 	assignVBOtoAttribute(shaderProgram, "texCoord0", bufTexCoords, 2);
 
-	glBindVertexArray(0); //Dezaktywuj VAO
-						  //******Koniec przygotowania obiektu************
+	glBindVertexArray(0); 
+	glDeleteBuffers(1, &bufVertices); //Usuniêcie VBO z wierzcho³kami
+	glDeleteBuffers(1, &bufColors); //Usuniêcie VBO z kolorami
+	glDeleteBuffers(1, &bufNormals); //Usuniêcie VBO z wektorami normalnymi
+	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
+
+	//Background
+	bufVertices = makeBuffer(backgroundModel.vertices, backgroundModel.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków
+	bufColors = makeBuffer(backgroundModel.colors, backgroundModel.vertexCount, sizeof(float) * 4);//VBO z kolorami wierzcho³ków
+	bufNormals = makeBuffer(backgroundModel.normals, backgroundModel.vertexCount, sizeof(float) * 4);//VBO z wektorami normalnymi wierzcho³ków
+	bufTexCoords = makeBuffer(backgroundModel.texCoords, backgroundModel.vertexCount, sizeof(float) * 2);
+
+	glGenVertexArrays(1, &backgroundVAO); //Wygeneruj uchwyt na VAO i zapisz go do zmiennej globalnej
+	
+
+
+	glBindVertexArray(backgroundVAO); //Uaktywnij nowo utworzony VAO
+
+	assignVBOtoAttribute(backgroundShaderProgram, "vertex", bufVertices, 4); //"vertex" odnosi siê do deklaracji "in vec4 vertex;" w vertex shaderze
+	assignVBOtoAttribute(backgroundShaderProgram, "color", bufColors, 4); //"color" odnosi siê do deklaracji "in vec4 color;" w vertex shaderze
+	assignVBOtoAttribute(backgroundShaderProgram, "normal", bufNormals, 4); //"normal" odnosi siê do deklaracji "in vec4 normal;" w vertex shaderze
+	assignVBOtoAttribute(backgroundShaderProgram, "texCoord0", bufTexCoords, 2);
+
+	glBindVertexArray(0);
+
+
+	glDeleteBuffers(1, &bufVertices); //Usuniêcie VBO z wierzcho³kami
+	glDeleteBuffers(1, &bufColors); //Usuniêcie VBO z kolorami
+	glDeleteBuffers(1, &bufNormals); //Usuniêcie VBO z wektorami normalnymi
+	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
 
 	tex0 = readTexture("testTex.png");
 
@@ -112,40 +146,40 @@ void Drawer::drawScene(cv::Mat frame, float angle) {
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
-
 	//Wylicz macierz modelu rysowanego obiektu
 	glm::mat4 M = glm::mat4(1.0f);
 	M = glm::rotate(M, angle, glm::vec3(0, 1, 0));
+
 	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
 
 	//tex0 = frame.data;
 	currentFrameTex = readFrame(frame);
 
 	//Narysuj obiekt
-	drawObject(vao, shaderProgram, P, V, M);
+	drawObject(vao, shaderProgram, P, V, M, model);
 	//model.drawSolid();
+
+	//draw backgroud
+	//P = glm::mat4(1.0);
+	//M = glm::mat4(1.0);
+	//V = glm::mat4(1.0);
+
+	drawObject(backgroundVAO, backgroundShaderProgram, P, V, M, backgroundModel);
+
 
 	//Przerzuæ tylny bufor na przedni
 	glfwSwapBuffers(window);
 
 }
-void Drawer::drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4 mM) {
+void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, Models::Model object) {
 	//W³¹czenie programu cieniuj¹cego, który ma zostaæ u¿yty do rysowania
 	//W tym programie wystarczy³oby wywo³aæ to raz, w setupShaders, ale chodzi o pokazanie, 
 	//¿e mozna zmieniaæ program cieniuj¹cy podczas rysowania jednej sceny
-	shaderProgram->use();
+	shader->use();
 
-	//Przeka¿ do shadera macierze P,V i M.
-	//W linijkach poni¿ej, polecenie:
-	//  shaderProgram->getUniformLocation("P") 
-	//pobiera numer slotu odpowiadaj¹cego zmiennej jednorodnej o podanej nazwie
-	//UWAGA! "P" w powy¿szym poleceniu odpowiada deklaracji "uniform mat4 P;" w vertex shaderze, 
-	//a mP w glm::value_ptr(mP) odpowiada argumentowi  "mat4 mP;" TYM pliku.
-	//Ca³a poni¿sza linijka przekazuje do zmiennej jednorodnej P w vertex shaderze dane z argumentu mP niniejszej funkcji
-	//Pozosta³e polecenia dzia³aj¹ podobnie.
-	glUniformMatrix4fv(shaderProgram->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
-	glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
-	glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
+	glUniformMatrix4fv(shader->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
+	glUniformMatrix4fv(shader->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
+	glUniformMatrix4fv(shader->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, currentFrameTex);
@@ -153,7 +187,7 @@ void Drawer::drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 
 	glBindVertexArray(vao);
 
 	//Narysowanie obiektu
-	glDrawArrays(GL_TRIANGLES, 0, model.vertexCount);
+	glDrawArrays(GL_TRIANGLES, 0, object.vertexCount);
 
 	//Posprz¹tanie po sobie (niekonieczne w sumie je¿eli korzystamy z VAO dla ka¿dego rysowanego obiektu)
 	glBindVertexArray(0);
@@ -191,11 +225,6 @@ GLuint Drawer::readFrame(cv::Mat frame) {
 		std::cout << "Error: Frame is not continuous!!!\n";
 		return tex0;
 	}
-	cv::resize(frame, frame, cv::Size(512, 512));
-
-	unsigned width = frame.cols, height = frame.rows;
-	std::vector<uchar> image(frame.rows*frame.cols);
-	image.assign(frame.datastart, frame.dataend);
 	//Import do pamiêci karty graficznej
 	glGenTextures(1, &tex); //Zainicjuj jeden uchwyt
 	glBindTexture(GL_TEXTURE_2D, tex); //Uaktywnij uchwyt
@@ -212,10 +241,6 @@ void Drawer::freeOpenGLProgram() {
 	delete shaderProgram; //Usuniêcie programu cieniuj¹cego
 
 	glDeleteVertexArrays(1, &vao); //Usuniêcie vao
-	glDeleteBuffers(1, &bufVertices); //Usuniêcie VBO z wierzcho³kami
-	glDeleteBuffers(1, &bufColors); //Usuniêcie VBO z kolorami
-	glDeleteBuffers(1, &bufNormals); //Usuniêcie VBO z wektorami normalnymi
-	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
 
 
 }
