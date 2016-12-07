@@ -115,6 +115,7 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
 
 	tex0 = readTexture("testTex.png");
+	currentFrameTex = initFrameTexture();
 
 }
 void Drawer::assignVBOtoAttribute(ShaderProgram *shaderProgram, char* attributeName, GLuint bufVBO, int vertexSize) {
@@ -134,7 +135,7 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 	return handle;
 }
 //Procedura rysuj¹ca zawartoœæ sceny
-void Drawer::drawScene(cv::Mat frame, float angle) {
+void Drawer::drawScene(cv::Mat *frame, float angle) {
 	//************Tutaj umieszczaj kod rysuj¹cy obraz******************l
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
@@ -153,16 +154,13 @@ void Drawer::drawScene(cv::Mat frame, float angle) {
 	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
 
 	//tex0 = frame.data;
-	currentFrameTex = readFrame(frame);
+	readFrame(frame, currentFrameTex);
 
 	//Narysuj obiekt
 	drawObject(vao, shaderProgram, P, V, M, model);
 	//model.drawSolid();
 
 	//draw backgroud
-	//P = glm::mat4(1.0);
-	//M = glm::mat4(1.0);
-	//V = glm::mat4(1.0);
 
 	drawObject(backgroundVAO, backgroundShaderProgram, P, V, M, backgroundModel);
 
@@ -172,9 +170,6 @@ void Drawer::drawScene(cv::Mat frame, float angle) {
 
 }
 void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, Models::Model object) {
-	//W³¹czenie programu cieniuj¹cego, który ma zostaæ u¿yty do rysowania
-	//W tym programie wystarczy³oby wywo³aæ to raz, w setupShaders, ale chodzi o pokazanie, 
-	//¿e mozna zmieniaæ program cieniuj¹cy podczas rysowania jednej sceny
 	shader->use();
 
 	glUniformMatrix4fv(shader->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
@@ -217,30 +212,31 @@ GLuint Drawer::readTexture(char* filename) {
 
 	return tex;
 }
-GLuint Drawer::readFrame(cv::Mat frame) {
+GLuint Drawer::initFrameTexture() {
 	GLuint tex;
 	glActiveTexture(GL_TEXTURE0);
 
-	if (!frame.isContinuous()) {
-		std::cout << "Error: Frame is not continuous!!!\n";
-		return tex0;
-	}
 	//Import do pamiêci karty graficznej
 	glGenTextures(1, &tex); //Zainicjuj jeden uchwyt
+
 	glBindTexture(GL_TEXTURE_2D, tex); //Uaktywnij uchwyt
 									   //Wczytaj obrazek do pamiêci KG skojarzonej z uchwytem
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame.cols, frame.rows, 0,
-		GL_BGR, GL_UNSIGNED_BYTE, frame.ptr());
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	return tex;
 }
+void Drawer::readFrame(cv::Mat *frame, GLuint tex) {
+	glActiveTexture(GL_TEXTURE0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame->cols, frame->rows, 0,
+	GL_BGR, GL_UNSIGNED_BYTE, frame->ptr());
+}
 void Drawer::freeOpenGLProgram() {
 	delete shaderProgram; //Usuniêcie programu cieniuj¹cego
+	delete backgroundShaderProgram;
 
 	glDeleteVertexArrays(1, &vao); //Usuniêcie vao
+	glDeleteVertexArrays(1, &backgroundVAO);
 
 
 }

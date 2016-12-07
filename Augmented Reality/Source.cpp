@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 		//cv::imshow(WINDOW_NAME, frame);
 		angle += 3.14/2.f*glfwGetTime();
 		glfwSetTime(0);
-		drawer.drawScene(frame, angle);
+		drawer.drawScene(&frame, angle);
 		keyManager.handleEvents();
 	}
 

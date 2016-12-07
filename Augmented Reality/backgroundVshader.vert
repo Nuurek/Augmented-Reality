@@ -16,5 +16,6 @@ in vec4 normal; //wektor normalny w wierzcholku (na razie ignorowany)
 
 void main(void) {
 	gl_Position=vec4(vertex.xyz,1.f);
+	//gl_Position=P*V*M*vertex;
 	iTexCoord0=texCoord0;
 }

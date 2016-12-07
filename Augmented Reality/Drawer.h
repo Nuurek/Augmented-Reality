@@ -19,7 +19,7 @@ public:
 	Drawer();
 	~Drawer();
 	void init(int frameWidth, int frameHeight);
-	void drawScene(cv::Mat frame,float angle);
+	void drawScene(cv::Mat *frame,float angle);
 	GLFWwindow* getWindow();
 	
 private:
@@ -28,7 +28,8 @@ private:
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
 	GLuint readTexture(char* filename);
-	GLuint readFrame(cv::Mat frame);
+	GLuint initFrameTexture();
+	void readFrame(cv::Mat *frame, GLuint tex);
 	void freeOpenGLProgram();
 	GLuint tex0;
 	GLuint currentFrameTex;
