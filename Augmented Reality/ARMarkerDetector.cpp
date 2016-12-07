@@ -5,13 +5,15 @@ ARMarkerDetector::ARMarkerDetector(const size_t borderSize, const size_t regionS
 	: RegionBasedOperator(borderSize, regionSize, stepSize),
 	edgelDetector(borderSize, regionSize, stepSize),
 	lineSegmentMerger(borderSize, regionSize, stepSize),
-	lineSegmentExtender(borderSize, regionSize, stepSize) {}
+	lineSegmentExtender(borderSize, regionSize, stepSize),
+	cornersFinder(borderSize, regionSize, stepSize) {}
 
 void ARMarkerDetector::setBuffer(Buffer * buffer) {
 	RegionBasedOperator::setBuffer(buffer);
 	edgelDetector.setBuffer(buffer);
 	lineSegmentMerger.setBuffer(buffer);
 	lineSegmentExtender.setBuffer(buffer);
+	cornersFinder.setBuffer(buffer);
 }
 
 void ARMarkerDetector::findARMarkers() {
@@ -82,7 +84,11 @@ void ARMarkerDetector::findARMarkers() {
 
 	extendedLineSegments = lineSegmentExtender.extendLineSegments(mergedLineSegments);
 
-	lineSegmentsWithCorner = lineSegmentExtender.findLinesWithCorners(extendedLineSegments);
+	std::cout << "Extended line segments: " << extendedLineSegments.size() << "\n";
+
+	lineSegmentsWithCorner = cornersFinder.findLinesWithCorners(extendedLineSegments);
+
+	std::cout << "Line segments with corner: " << lineSegmentsWithCorner.size() << "\n";
 }
 
 std::vector<Edgel> ARMarkerDetector::getEdgels() {

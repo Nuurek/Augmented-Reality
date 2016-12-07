@@ -6,6 +6,7 @@
 #include "LineSegmentDetector.h"
 #include "LineSegmentMerger.h"
 #include "LineSegmentExtender.h"
+#include "CornersFinder.h"
 
 
 const size_t EDGELS_IN_REGION = 5;
@@ -19,6 +20,7 @@ class ARMarkerDetector : public RegionBasedOperator {
 	std::vector<LineSegment> mergedLineSegments;
 	LineSegmentExtender lineSegmentExtender;
 	std::vector<LineSegment> extendedLineSegments;
+	CornersFinder cornersFinder;
 	std::vector<LineSegment> lineSegmentsWithCorner;
 
 	void clearStructures();
