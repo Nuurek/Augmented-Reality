@@ -1,11 +1,14 @@
 #pragma once
+#include <list>
 
 #include "LineSegment.h"
-#include "Marker.h"
+#include "ARMarker.h"
 
 class MarkerFinder {
+	ARMarker findMarker(std::list<LineSegment>& listOfSegments);
+	bool areSegmentsInChain(LineSegment& predecessor, LineSegment& successor);
 
 public:
-	std::vector<Marker> findMarkers(std::vector<LineSegment>);
+	std::vector<ARMarker> findMarkers(std::vector<LineSegment> linesWithCorners);
 };
 

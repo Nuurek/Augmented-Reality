@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ARMarker.cpp" />
     <ClCompile Include="ARMarkerDetector.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="CornersFinder.cpp" />
@@ -170,7 +171,7 @@
     <ClInclude Include="Edgel.h" />
     <ClInclude Include="EdgelDetector.h" />
     <ClInclude Include="FrameDecorator.h" />
-    <ClInclude Include="Marker.h" />
+    <ClInclude Include="ARMarker.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LineSegment.h" />
     <ClInclude Include="LineSegmentDetector.h" />

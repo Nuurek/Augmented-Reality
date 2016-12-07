@@ -5,7 +5,7 @@
 
 
 const float LINE_COINCIDENCE_DISTANCE = 0.75f;
-
+const float LINE_ORIENTATION_THRESHOLD = cosf((90.0f - ORIENTATION_DEGREE) * static_cast<float>(M_PI) / 180.0f);
 
 class LineSegment {
 	float distanceFromPointToLine(Edgel& start, Edgel& end, Edgel& point) const;
@@ -28,5 +28,6 @@ public:
 	Vector2f getStartEndSlope();
 	Vector2f getOrienation();
 	void swapEndPoints();
+	bool isOrientationCompatible(LineSegment& rhs) const;
 };
 

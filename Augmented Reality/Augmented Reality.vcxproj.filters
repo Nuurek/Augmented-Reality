@@ -57,6 +57,9 @@
     <ClCompile Include="CornersFinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ARMarker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EdgelDetector.h">
@@ -95,10 +98,10 @@
     <ClInclude Include="MarkerFinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Marker.h">
+    <ClInclude Include="CornersFinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CornersFinder.h">
+    <ClInclude Include="ARMarker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
