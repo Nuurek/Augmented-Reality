@@ -11,7 +11,8 @@ class KeyManager {
 		{'3', "edgels"},
 		{'4', "lineSegments"},
 		{'5', "mergedLineSegments"},
-		{'6', "extendedLineSegments"}
+		{'6', "extendedLineSegments"},
+		{'7', "lineSegmentsWithCorner"}
 	};
 
 public:

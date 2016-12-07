@@ -19,6 +19,7 @@ class ARMarkerDetector : public RegionBasedOperator {
 	std::vector<LineSegment> mergedLineSegments;
 	LineSegmentExtender lineSegmentExtender;
 	std::vector<LineSegment> extendedLineSegments;
+	std::vector<LineSegment> lineSegmentsWithCorner;
 
 	void clearStructures();
 
@@ -33,5 +34,6 @@ public:
 	std::vector<LineSegment> getLineSegments();
 	std::vector<LineSegment> getMergedLineSegments();
 	std::vector<LineSegment> getExtendedLineSegments();
+	std::vector<LineSegment> getLineSegmentsWithCorner();
 };
 

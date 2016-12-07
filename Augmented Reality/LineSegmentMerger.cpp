@@ -81,7 +81,7 @@ bool LineSegmentMerger::isLineExtensible(Vector2f startPoint, Vector2f & endPoin
 	for (size_t step = 0; step < maxLength; step++) {
 		startPoint += slope;
 
-		if (isPointInFrame(startPoint.x, startPoint.y)) {
+		if (isPointOutsideBorder(startPoint.x, startPoint.y)) {
 			break;
 		}
 

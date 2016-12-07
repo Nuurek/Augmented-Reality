@@ -15,6 +15,7 @@ public:
 	Vector2f slope;
 	std::vector<Edgel> supportEdgels;
 	bool isMerged = false;
+	bool startCorner = false, endCorner = false;
 
 	LineSegment() = default;
 	LineSegment(Edgel start, Edgel end);

@@ -109,6 +109,12 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, extendedLineSegments);
 		}
 
+
+		if (keyManager.isActive("lineSegmentsWithCorner")) {
+			auto lineSegmentsWithCorner = detector.getLineSegmentsWithCorner();
+			decorator.drawLineSegments(frame, lineSegmentsWithCorner);
+		}
+
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
