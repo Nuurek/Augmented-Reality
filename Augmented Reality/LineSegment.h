@@ -20,7 +20,7 @@ public:
 	LineSegment() = default;
 	LineSegment(Edgel start, Edgel end);
 
-	inline bool operator==(LineSegment& rhs) const {
+	inline bool operator==(const LineSegment& rhs) const {
 		return start == rhs.start && end == rhs.end && slope == rhs.slope;
 	}
 

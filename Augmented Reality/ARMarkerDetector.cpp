@@ -89,6 +89,8 @@ void ARMarkerDetector::findARMarkers() {
 	lineSegmentsWithCorner = cornersFinder.findLinesWithCorners(extendedLineSegments);
 
 	std::cout << "Line segments with corner: " << lineSegmentsWithCorner.size() << "\n";
+
+	arMarkers = markerFinder.findMarkers(lineSegmentsWithCorner);
 }
 
 std::vector<Edgel> ARMarkerDetector::getEdgels() {
@@ -111,10 +113,15 @@ std::vector<LineSegment> ARMarkerDetector::getLineSegmentsWithCorner() {
 	return lineSegmentsWithCorner;
 }
 
+std::vector<ARMarker> ARMarkerDetector::getARMarkers() {
+	return arMarkers;
+}
+
 void ARMarkerDetector::clearStructures() {
 	edgels.clear();
 	lineSegments.clear();
 	mergedLineSegments.clear();
 	extendedLineSegments.clear();
 	lineSegmentsWithCorner.clear();
+	arMarkers.clear();
 }

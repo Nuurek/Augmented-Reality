@@ -15,7 +15,7 @@ public:
 	Vector2f position;
 	Vector2f slope;
 
-	inline bool operator==(Edgel& rhs) const {
+	inline bool operator==(const Edgel& rhs) const {
 		return position == rhs.position && slope == rhs.slope;
 	}
 

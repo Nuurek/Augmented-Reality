@@ -7,7 +7,7 @@
 #include "LineSegmentMerger.h"
 #include "LineSegmentExtender.h"
 #include "CornersFinder.h"
-
+#include "MarkerFinder.h"
 
 const size_t EDGELS_IN_REGION = 5;
 
@@ -22,6 +22,8 @@ class ARMarkerDetector : public RegionBasedOperator {
 	std::vector<LineSegment> extendedLineSegments;
 	CornersFinder cornersFinder;
 	std::vector<LineSegment> lineSegmentsWithCorner;
+	MarkerFinder markerFinder;
+	std::vector<ARMarker> arMarkers;
 
 	void clearStructures();
 
@@ -37,5 +39,6 @@ public:
 	std::vector<LineSegment> getMergedLineSegments();
 	std::vector<LineSegment> getExtendedLineSegments();
 	std::vector<LineSegment> getLineSegmentsWithCorner();
+	std::vector<ARMarker> getARMarkers();
 };
 
