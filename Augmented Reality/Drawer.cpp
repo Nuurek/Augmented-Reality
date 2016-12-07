@@ -15,9 +15,10 @@ Drawer::Drawer()
 
 Drawer::~Drawer()
 {
+	freeOpenGLProgram();
 }
 
-void Drawer::init()
+void Drawer::init(int frameWidth, int frameHeight)
 {
 	GLFWwindow* window; //WskaŸnik na obiekt reprezentuj¹cy okno
 
@@ -27,8 +28,8 @@ void Drawer::init()
 		fprintf(stderr, "Nie mo¿na zainicjowaæ GLFW.\n");
 		exit(EXIT_FAILURE);
 	}
-
-	window = glfwCreateWindow(640, 480, "AR Markers", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
+	aspectRatio = (float)frameHeight / (float)frameWidth;
+	window = glfwCreateWindow(frameWidth, frameHeight, "AR Markers", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
 
 	if (!window) //Je¿eli okna nie uda³o siê utworzyæ, to zamknij program
 	{
@@ -99,7 +100,7 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 	return handle;
 }
 //Procedura rysuj¹ca zawartoœæ sceny
-void Drawer::drawScene() {
+void Drawer::drawScene(cv::Mat frame, float angle) {
 	//************Tutaj umieszczaj kod rysuj¹cy obraz******************l
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
@@ -114,8 +115,11 @@ void Drawer::drawScene() {
 
 	//Wylicz macierz modelu rysowanego obiektu
 	glm::mat4 M = glm::mat4(1.0f);
-	//M = glm::rotate(M, angle_x, glm::vec3(1, 0, 0));
+	M = glm::rotate(M, angle, glm::vec3(0, 1, 0));
 	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
+
+	//tex0 = frame.data;
+	currentFrameTex = readFrame(frame);
 
 	//Narysuj obiekt
 	drawObject(vao, shaderProgram, P, V, M);
@@ -143,6 +147,8 @@ void Drawer::drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 
 	glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
 	glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, currentFrameTex);
 	//Uaktywnienie VAO i tym samym uaktywnienie predefiniowanych w tym VAO powi¹zañ slotów atrybutów z tablicami z danymi
 	glBindVertexArray(vao);
 
@@ -177,4 +183,39 @@ GLuint Drawer::readTexture(char* filename) {
 
 	return tex;
 }
+GLuint Drawer::readFrame(cv::Mat frame) {
+	GLuint tex;
+	glActiveTexture(GL_TEXTURE0);
 
+	if (!frame.isContinuous()) {
+		std::cout << "Error: Frame is not continuous!!!\n";
+		return tex0;
+	}
+	cv::resize(frame, frame, cv::Size(512, 512));
+
+	unsigned width = frame.cols, height = frame.rows;
+	std::vector<uchar> image(frame.rows*frame.cols);
+	image.assign(frame.datastart, frame.dataend);
+	//Import do pamiêci karty graficznej
+	glGenTextures(1, &tex); //Zainicjuj jeden uchwyt
+	glBindTexture(GL_TEXTURE_2D, tex); //Uaktywnij uchwyt
+									   //Wczytaj obrazek do pamiêci KG skojarzonej z uchwytem
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame.cols, frame.rows, 0,
+		GL_BGR, GL_UNSIGNED_BYTE, frame.ptr());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return tex;
+}
+void Drawer::freeOpenGLProgram() {
+	delete shaderProgram; //Usuniêcie programu cieniuj¹cego
+
+	glDeleteVertexArrays(1, &vao); //Usuniêcie vao
+	glDeleteBuffers(1, &bufVertices); //Usuniêcie VBO z wierzcho³kami
+	glDeleteBuffers(1, &bufColors); //Usuniêcie VBO z kolorami
+	glDeleteBuffers(1, &bufNormals); //Usuniêcie VBO z wektorami normalnymi
+	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
+
+
+}

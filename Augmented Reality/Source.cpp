@@ -9,13 +9,14 @@
 #include "KeyManager.h"
 #include "FrameDecorator.h"
 
+#define GLM_FORCE_RADIANS
 
 const unsigned int FPS = 30;
 const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = false;
+const bool USE_CAMERA = true;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -47,7 +48,7 @@ int main(int argc, char** argv) {
 
 	//cv::namedWindow(WINDOW_NAME);
 	Drawer drawer;
-	drawer.init();
+	drawer.init(FRAME_WIDTH,FRAME_HEIGHT);
 
 	auto videoWriter = cv::VideoWriter();
 	if (WRITE_VIDEO) {
@@ -70,7 +71,9 @@ int main(int argc, char** argv) {
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	bool isRunning=true;
-	while (isRunning) {
+	glfwSetTime(0);
+	float angle = 0;
+	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
 		} else {
@@ -108,16 +111,17 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, lineSegments);
 		}
 
-		if (keyManager.isActive("escape")) {
-			isRunning = false;
-		}
+		if (keyManager.isActive("escape")) 
+			glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
 
 		//cv::imshow(WINDOW_NAME, frame);
-		drawer.drawScene();
+		angle += 3.14/2.f*glfwGetTime();
+		glfwSetTime(0);
+		drawer.drawScene(frame, angle);
 		keyManager.handleEvents();
 	}
 
