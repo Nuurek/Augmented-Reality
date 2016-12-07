@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
+#include "lodepng.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -28,7 +28,7 @@ void Drawer::init()
 		exit(EXIT_FAILURE);
 	}
 
-	window = glfwCreateWindow(500, 500, "OpenGL", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
+	window = glfwCreateWindow(640, 480, "AR Markers", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
 
 	if (!window) //Je¿eli okna nie uda³o siê utworzyæ, to zamknij program
 	{
@@ -57,7 +57,7 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	glEnable(GL_DEPTH_TEST); //W³¹cz u¿ywanie Z-Bufora
 
 
-	shaderProgram = new ShaderProgram("vshader.txt", NULL, "fshader.txt"); //Wczytaj program cieniuj¹cy 
+	shaderProgram = new ShaderProgram("vshader.vert", NULL, "fshader.frag"); //Wczytaj program cieniuj¹cy 
 
 
 																		   //*****Przygotowanie do rysowania pojedynczego obiektu*******
@@ -65,7 +65,7 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	bufVertices = makeBuffer(model.vertices, model.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków
 	bufColors = makeBuffer(model.colors, model.vertexCount, sizeof(float) * 4);//VBO z kolorami wierzcho³ków
 	bufNormals = makeBuffer(model.normals, model.vertexCount, sizeof(float) * 4);//VBO z wektorami normalnymi wierzcho³ków
-
+	bufTexCoords = makeBuffer(model.texCoords, model.vertexCount, sizeof(float) * 2);
 																	 //Zbuduj VAO wi¹¿¹cy atrybuty z konkretnymi VBO
 	glGenVertexArrays(1, &vao); //Wygeneruj uchwyt na VAO i zapisz go do zmiennej globalnej
 
@@ -74,9 +74,12 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	assignVBOtoAttribute(shaderProgram, "vertex", bufVertices, 4); //"vertex" odnosi siê do deklaracji "in vec4 vertex;" w vertex shaderze
 	assignVBOtoAttribute(shaderProgram, "color", bufColors, 4); //"color" odnosi siê do deklaracji "in vec4 color;" w vertex shaderze
 	assignVBOtoAttribute(shaderProgram, "normal", bufNormals, 4); //"normal" odnosi siê do deklaracji "in vec4 normal;" w vertex shaderze
+	assignVBOtoAttribute(shaderProgram, "texCoord0", bufTexCoords, 2);
 
 	glBindVertexArray(0); //Dezaktywuj VAO
 						  //******Koniec przygotowania obiektu************
+
+	tex0 = readTexture("testTex.png");
 
 }
 void Drawer::assignVBOtoAttribute(ShaderProgram *shaderProgram, char* attributeName, GLuint bufVBO, int vertexSize) {
@@ -101,7 +104,7 @@ void Drawer::drawScene() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
 
-	glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(50 * PI / 180, 4.f/3.f, 1.0f, 50.0f); //Wylicz macierz rzutowania
 
 	glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
 		glm::vec3(0.0f, 0.0f, -5.0f),
@@ -152,3 +155,26 @@ void Drawer::drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 
 GLFWwindow* Drawer::getWindow() {
 	return window;
 }
+GLuint Drawer::readTexture(char* filename) {
+	GLuint tex;
+	glActiveTexture(GL_TEXTURE0);
+
+	//Wczytanie do pamiêci komputera
+	std::vector<unsigned char> image;   //Alokuj wektor do wczytania obrazka
+	unsigned width, height;   //Zmienne do których wczytamy wymiary obrazka
+							  //Wczytaj obrazek
+	unsigned error = lodepng::decode(image, width, height, filename);
+
+	//Import do pamiêci karty graficznej
+	glGenTextures(1, &tex); //Zainicjuj jeden uchwyt
+	glBindTexture(GL_TEXTURE_2D, tex); //Uaktywnij uchwyt
+									   //Wczytaj obrazek do pamiêci KG skojarzonej z uchwytem
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return tex;
+}
+

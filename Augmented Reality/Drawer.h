@@ -2,6 +2,7 @@
 #include "ShaderProgram.h"
 #include "Teapot.h"
 #include "Model.h"
+#include "Cube.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -21,13 +22,16 @@ private:
 	void initOpenGLProgram(GLFWwindow * window);
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
-	ShaderProgram *shaderProgram;
+	GLuint readTexture(char* filename);
+	GLuint tex0;
 
+	ShaderProgram *shaderProgram;
 	GLuint vao;
 	GLuint bufVertices; //Uchwyt na bufor VBO przechowuj¹cy tablicê wspó³rzêdnych wierzcho³ków
 	GLuint bufColors;  //Uchwyt na bufor VBO przechowuj¹cy tablicê kolorów
 	GLuint bufNormals; //Uchwyt na bufor VBO przechowuj¹cy tablickê wektorów normalnych
-	Models::Model model = Models::teapot;
+	GLuint bufTexCoords;
+	Models::Model model = Models::cube;
 	const float PI = 3.141592653589793f; 
 	GLFWwindow* window;
 };

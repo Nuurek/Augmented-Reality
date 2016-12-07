@@ -165,6 +165,7 @@
     <ClCompile Include="LineSegment.cpp" />
     <ClCompile Include="LineSegmentDetector.cpp" />
     <ClCompile Include="LineSegmentMerger.cpp" />
+    <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="LineSegment.h" />
     <ClInclude Include="LineSegmentDetector.h" />
     <ClInclude Include="LineSegmentMerger.h" />
+    <ClInclude Include="lodepng.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="RegionBasedOperator.h" />
     <ClInclude Include="ShaderProgram.h" />
@@ -191,8 +193,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fshader.txt" />
-    <Text Include="vshader.txt" />
+    <Text Include="fshader.frag" />
+    <Text Include="vshader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="testTex.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
