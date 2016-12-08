@@ -115,6 +115,11 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, lineSegmentsWithCorner);
 		}
 
+		if (keyManager.isActive("markers")) {
+			auto markers = detector.getARMarkers();
+			decorator.drawARMarkers(frame, markers);
+		}
+
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}

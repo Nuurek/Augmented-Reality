@@ -12,7 +12,8 @@ class KeyManager {
 		{'4', "lineSegments"},
 		{'5', "mergedLineSegments"},
 		{'6', "extendedLineSegments"},
-		{'7', "lineSegmentsWithCorner"}
+		{'7', "lineSegmentsWithCorner"},
+		{'8', "markers"}
 	};
 
 public:

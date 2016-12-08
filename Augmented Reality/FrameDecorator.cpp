@@ -44,6 +44,12 @@ void FrameDecorator::drawLineSegments(cv::Mat & frame, std::vector<LineSegment> 
 	}
 }
 
+void FrameDecorator::drawARMarkers(cv::Mat & frame, std::vector<ARMarker> markers) {
+	for (auto& marker : markers) {
+		drawARMarker(frame, marker);
+	}
+}
+
 void FrameDecorator::drawEdgel(cv::Mat & frame, Edgel & edgel) {
 	cv::Point center(static_cast<int>(edgel.position.x), static_cast<int>(edgel.position.y));
 
@@ -54,13 +60,26 @@ void FrameDecorator::drawLineSegment(cv::Mat & frame, LineSegment & lineSegment)
 	auto& start = lineSegment.start;
 	auto& end = lineSegment.end;
 	auto& slope = lineSegment.slope;
-	cv::Point startPoint(static_cast<int>(start.position.x), static_cast<int>(start.position.y));
-	cv::Point endPoint(static_cast<int>(end.position.x), static_cast<int>(end.position.y));
 
-	cv::Point leftHead(end.position.x + 5.0f * (-slope.x + slope.y), end.position.y + 5.0f * (-slope.y - slope.x));
-	cv::Point rightHead(end.position.x + 5.0f * (-slope.x - slope.y), end.position.y + 5.0f * (-slope.y + slope.x));
-
-	cv::line(frame, endPoint, startPoint, yellowColor, 2);
-	cv::line(frame, endPoint, leftHead, redColor, 2);
-	cv::line(frame, endPoint, rightHead, redColor, 2);
+	drawLine(frame, start.position, end.position, yellowColor, 2);
+	drawLine(frame, end.position, Vector2f(end.position.x + 5.0f * (-slope.x + slope.y), end.position.y + 5.0f * (-slope.y - slope.x)), redColor, 2);
+	drawLine(frame, end.position, Vector2f(end.position.x + 5.0f * (-slope.x - slope.y), end.position.y + 5.0f * (-slope.y + slope.x)), redColor, 2);
 }
+
+void FrameDecorator::drawARMarker(cv::Mat & frame, ARMarker & marker) {
+	auto& vertices = marker.vertices;
+	auto size = vertices.size();
+	for (int i = 0; i < size; i++) {
+		auto& start = vertices[i];
+		auto& end = vertices[(i + 1) % size];
+		drawLine(frame, start, end, redColor, 2);
+	}
+}
+
+void FrameDecorator::drawLine(cv::Mat& frame, Vector2f& start, Vector2f& end, cv::Scalar& color, int thickness) const {
+	cv::Point startPoint(static_cast<int>(start.x), static_cast<int>(start.y));
+	cv::Point endPoint(static_cast<int>(end.x), static_cast<int>(end.y));
+
+	cv::line(frame, startPoint, endPoint, color, thickness);
+}
+

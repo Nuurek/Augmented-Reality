@@ -5,6 +5,7 @@
 #include "RegionBasedOperator.h"
 #include "Edgel.h"
 #include "LineSegment.h"
+#include "ARMarker.h"
 
 
 class FrameDecorator : RegionBasedOperator {
@@ -17,6 +18,9 @@ class FrameDecorator : RegionBasedOperator {
 
 	void drawEdgel(cv::Mat& frame, Edgel& edgel);
 	void drawLineSegment(cv::Mat& frame, LineSegment& lineSegment);
+	void drawARMarker(cv::Mat& frame, ARMarker& marker);
+
+	void drawLine(cv::Mat& frame, Vector2f& start, Vector2f& end, cv::Scalar& color, int thickness) const;
 public:
 	FrameDecorator(const size_t borderSize, const size_t regionSize, const size_t stepSize);
 
@@ -24,5 +28,6 @@ public:
 	void drawSubRegionLines(cv::Mat& frame);
 	void drawEdgels(cv::Mat& frame, std::vector<Edgel> edgels);
 	void drawLineSegments(cv::Mat& frame, std::vector<LineSegment> lineSegments);
+	void drawARMarkers(cv::Mat& frame, std::vector<ARMarker> markers);
 };
 
