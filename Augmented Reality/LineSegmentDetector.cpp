@@ -35,6 +35,7 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 				LineSegment newLineSegment(start, end);
 
 				for (auto& edgel : edgels) {
+					++counter;
 					if (newLineSegment.coincide(edgel)) {
 						newLineSegment.supportEdgels.push_back(edgel);
 					}
@@ -107,5 +108,5 @@ std::vector<LineSegment> LineSegmentDetector::findLineSegmentsInRegion(std::vect
 }
 
 bool LineSegmentDetector::isEdgelsPairFound(Edgel & start, Edgel & end, size_t iteration) {
-	return !((start == end ||	!start.isOrientationCompatible(end)) && iteration < EDGELS_PAIRING_ITERATIONS);
+	return !(!start.isOrientationCompatible(end) && iteration < EDGELS_PAIRING_ITERATIONS);
 }

@@ -26,7 +26,7 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 			}
 
 			if (previousPixelOne > 0 && previousPixelOne > previousPixelTwo && previousPixelOne > firstChannel) {
-				size_t trueX = regionLeft + x;
+				size_t trueX = regionLeft + x - 1;
 				size_t trueY = regionTop + y;
 				edgels.emplace_back(Edgel(trueX, trueY, edgelGradientIntensity(trueX, trueY)));
 			}
@@ -54,7 +54,7 @@ std::vector<Edgel> EdgelDetector::findEdgelsInRegion(size_t regionLeft, size_t r
 
 			if (previousPixelOne > 0 && previousPixelOne > previousPixelTwo && previousPixelOne > firstChannel) {
 				size_t trueX = regionLeft + x;
-				size_t trueY = regionTop + y;
+				size_t trueY = regionTop + y - 1;
 				edgels.emplace_back(Edgel(trueX, trueY, edgelGradientIntensity(trueX, trueY)));
 			}
 			previousPixelTwo = previousPixelOne;
@@ -140,5 +140,5 @@ Vector2f EdgelDetector::edgelGradientIntensity(size_t x, size_t y) const {
 	gradientY -= 2 * buffer->getPixel(x + 1, y);
 	gradientY -= buffer->getPixel(x + 1, y + 1);
 
-	return Vector2f(static_cast<float>(gradientX), static_cast<float>(gradientY)).get_normalized();
+	return Vector2f(static_cast<float>(gradientY), static_cast<float>(gradientX)).get_normalized();
 }

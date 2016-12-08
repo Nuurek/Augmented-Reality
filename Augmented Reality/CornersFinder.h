@@ -2,7 +2,7 @@
 #include "LineSegmentMerger.h"
 
 const float DELTA_MULTIPLIER = 4.0f;
-const unsigned char WHITE_THRESHOLD = 200;
+const unsigned char WHITE_THRESHOLD = 200.0f;
 
 class CornersFinder :
 	public LineSegmentMerger {

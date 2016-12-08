@@ -27,6 +27,8 @@ void ARMarkerDetector::findARMarkers() {
 
 	clearStructures();
 
+	lineSegmentDetector.counter = 0;
+
 	for (size_t regionTop = BORDER_SIZE; regionTop < maxHeight; regionTop += REGION_SIZE) {
 		for (size_t regionLeft = BORDER_SIZE; regionLeft < maxWidth; regionLeft += REGION_SIZE) {
 			size_t regionWidth = std::min(REGION_SIZE, maxWidth - regionLeft);
@@ -74,6 +76,7 @@ void ARMarkerDetector::findARMarkers() {
 	std::cout << "Finding edgels: " << findingEdgelsTime << "us.\n";
 	std::cout << "Edgels: " << edgels.size() << "\n";
 	std::cout << "Finding line segments: " << findingLineSegments << "us.\n";
+	std::cout << "Counter: " << lineSegmentDetector.counter << "\n";
 
 	std::cout << "Line segments in regions: " << lineSegments.size() << "\n";
 	std::cout << "Merged line segments in regions: " << mergedLineSegments.size() << "\n";

@@ -4,7 +4,7 @@
 #include "LineSegment.h"
 #include "ARMarker.h"
 
-const float CHAIN_MAX_GAP = 64.0f;
+const float CHAIN_MAX_GAP = 16.0f;
 
 enum class EndPoint {NONE, START, END};
 

@@ -52,8 +52,11 @@ void FrameDecorator::drawARMarkers(cv::Mat & frame, std::vector<ARMarker> marker
 
 void FrameDecorator::drawEdgel(cv::Mat & frame, Edgel & edgel) {
 	cv::Point center(static_cast<int>(edgel.position.x), static_cast<int>(edgel.position.y));
+	auto red = 127.0 + edgel.slope.x * 128.0;
+	auto green = 127.0 + edgel.slope.y * 128.0;
+	cv::Scalar color{ 0.0, green, red };
 
-	cv::circle(frame, center, 1, blueColor, 2);
+	cv::circle(frame, center, 1, color, 2);
 }
 
 void FrameDecorator::drawLineSegment(cv::Mat & frame, LineSegment & lineSegment) {

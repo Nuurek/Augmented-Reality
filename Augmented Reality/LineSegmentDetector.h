@@ -16,5 +16,6 @@ class LineSegmentDetector{
 	bool isEdgelsPairFound(Edgel& start, Edgel& end, size_t iteration);
 
 public:	
+	int counter;
 	std::vector<LineSegment> findLineSegmentsInRegion(std::vector<Edgel> edgels);
 };
