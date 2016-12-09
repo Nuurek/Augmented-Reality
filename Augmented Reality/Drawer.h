@@ -19,7 +19,7 @@ public:
 	Drawer();
 	~Drawer();
 	void init(int frameWidth, int frameHeight);
-	void drawScene(cv::Mat *frame,float angle);
+	void drawScene(cv::Mat *frame, glm::mat4 cameraMatrix);
 	GLFWwindow* getWindow();
 	
 private:

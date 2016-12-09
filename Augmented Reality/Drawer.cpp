@@ -135,21 +135,20 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 	return handle;
 }
 //Procedura rysuj¹ca zawartoœæ sceny
-void Drawer::drawScene(cv::Mat *frame, float angle) {
+void Drawer::drawScene(cv::Mat *frame, glm::mat4 cameraMatrix) {
 	//************Tutaj umieszczaj kod rysuj¹cy obraz******************l
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
 
 	glm::mat4 P = glm::perspective(50 * PI / 180, 4.f/3.f, 1.0f, 50.0f); //Wylicz macierz rzutowania
 
-	glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
-		glm::vec3(0.0f, 0.0f, -5.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));
-
+	
+	//glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
+	//	glm::vec3(20.0f, 0.0f, 0.0f),
+	//	glm::vec3(0.0f, 0.0f, 1.0f),
+	//	glm::vec3(0.0f, -1.0f, 0.0f));
 	//Wylicz macierz modelu rysowanego obiektu
 	glm::mat4 M = glm::mat4(1.0f);
-	M = glm::rotate(M, angle, glm::vec3(0, 1, 0));
 
 	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
 
@@ -157,12 +156,12 @@ void Drawer::drawScene(cv::Mat *frame, float angle) {
 	readFrame(frame, currentFrameTex);
 
 	//Narysuj obiekt
-	drawObject(vao, shaderProgram, P, V, M, model);
+	drawObject(vao, shaderProgram, P, cameraMatrix, M, model);
 	//model.drawSolid();
 
 	//draw backgroud
 
-	drawObject(backgroundVAO, backgroundShaderProgram, P, V, M, backgroundModel);
+	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel);
 
 
 	//Przerzuæ tylny bufor na przedni

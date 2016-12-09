@@ -166,6 +166,7 @@
     <ClCompile Include="LineSegmentDetector.cpp" />
     <ClCompile Include="LineSegmentMerger.cpp" />
     <ClCompile Include="lodepng.cpp" />
+    <ClCompile Include="PoseFinder.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="LineSegmentMerger.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="PoseFinder.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="RegionBasedOperator.h" />
     <ClInclude Include="ShaderProgram.h" />

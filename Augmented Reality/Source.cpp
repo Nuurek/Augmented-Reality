@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <chrono>
-
+#include "PoseFinder.h"
 #include "Drawer.h"
 #include "Buffer.h"
 #include "ARMarkerDetector.h"
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	bool isRunning=true;
 	glfwSetTime(0);
-	float angle = 0;
+	glm::mat4 cameraMatrix = glm::mat4(1.0f);
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
@@ -111,6 +111,19 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, lineSegments);
 		}
 
+		if (keyManager.isActive("poseFinderExample")) {
+			std::vector<cv::Point2f> imagePoints = PoseFinder::getExample2DPoints();
+			for (auto point = imagePoints.begin(); point != imagePoints.end(); point++)
+				cv::circle(frame, *point, 5, CV_RGB(0, 255, 255), -1);
+			cameraMatrix = PoseFinder::findPose(PoseFinder::getExample2DPoints(), PoseFinder::getExample3DPoints());
+		}
+		else {
+			cameraMatrix = glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(0.0f, 0.0f, 5.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
 		if (keyManager.isActive("escape")) 
 			glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
 
@@ -119,9 +132,8 @@ int main(int argc, char** argv) {
 		}
 
 		//cv::imshow(WINDOW_NAME, frame);
-		angle += 3.14/2.f*glfwGetTime();
 		glfwSetTime(0);
-		drawer.drawScene(&frame, angle);
+		drawer.drawScene(&frame, cameraMatrix);
 		keyManager.handleEvents();
 	}
 
