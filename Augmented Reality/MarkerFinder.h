@@ -13,7 +13,7 @@ class MarkerFinder {
 	//std::vector<LineSegment> findMarker(std::list<LineSegment>& listOfSegments);
 	ARMarker convertChainToARMarker(std::vector<LineSegment>& chain);
 	
-	void findChainOfLines(LineSegment &startSegment, std::vector<LineSegment> &linesegments, std::vector<LineSegment> &chain, int& length);
+	std::vector<LineSegment> findChainOfLines(std::vector<LineSegment> &linesegments);
 	bool areSegmentsInChain(const LineSegment& first, const LineSegment& second) const;
 
 

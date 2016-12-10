@@ -69,54 +69,24 @@ ARMarker MarkerFinder::convertChainToARMarker(std::vector<LineSegment>& chain) {
 std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWithCorners) {
 	std::vector<ARMarker> markers;
 
-	if (linesWithCorners.size() >= 4) {
-		do {
+	while (linesWithCorners.size() >= 4) {
+		auto chain = findChainOfLines(linesWithCorners);
 
-			// pak een willekeurig segment, en probeer hier een chain mee te maken..
-			LineSegment chainSegment = linesWithCorners[0];
-			linesWithCorners[0] = linesWithCorners[linesWithCorners.size() - 1];
-			linesWithCorners.resize(linesWithCorners.size() - 1);
-
-			std::vector<LineSegment> chain;
-			int length = 1;
-
-			chain.push_back(chainSegment);
-
-			// kijk eerst of er schakels voor dit element moeten...
-			findChainOfLines(chainSegment, linesWithCorners, chain, length);
-
-			if (chain.size() > 3) {
-				markers.push_back(convertChainToARMarker(chain));
-			}
-		} while (linesWithCorners.size());
+		if (chain.size() == 4) {
+			markers.push_back(convertChainToARMarker(chain));
+		}
 	}
 
 	return markers;
 }
 
-void MarkerFinder::findChainOfLines(LineSegment &startSegment, std::vector<LineSegment> &lineSegments, std::vector<LineSegment> &chain, int& length) {
-	/*
-	for (int i = 0; i<lineSegments.size(); i++) {
-		if (!areSegmentsInChain(startSegment, lineSegments[i])) {
-			continue;
-		}
+std::vector<LineSegment> MarkerFinder::findChainOfLines(std::vector<LineSegment>& lineSegments) {
+	LineSegment startSegment = lineSegments[0];
+	lineSegments[0] = lineSegments[lineSegments.size() - 1];
+	lineSegments.resize(lineSegments.size() - 1);
 
-		length++;
-
-		LineSegment chainSegment = lineSegments[i];
-		lineSegments[i] = lineSegments[lineSegments.size() - 1];
-		lineSegments.resize(lineSegments.size() - 1);
-
-		if (length == 4) {
-			chain.push_back(chainSegment);
-			return;
-		}
-		// recursie!
-		findChainOfLines(chainSegment, lineSegments, chain, length);
-		chain.push_back(chainSegment);
-		return;
-	}
-	*/
+	std::vector<LineSegment> chain;
+	chain.push_back(startSegment);
 
 	bool nextSegmentFound = false;
 
@@ -136,6 +106,8 @@ void MarkerFinder::findChainOfLines(LineSegment &startSegment, std::vector<LineS
 			}
 		}
 	} while (nextSegmentFound && chain.size() < 4);
+
+	return chain;
 }
 
 bool MarkerFinder::areSegmentsInChain(const LineSegment& first, const LineSegment& second) const {
