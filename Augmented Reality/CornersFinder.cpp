@@ -19,25 +19,21 @@ std::vector<LineSegment> CornersFinder::findLinesWithCorners(std::vector<LineSeg
 
 
 bool CornersFinder::isLineSegmentWithBorder(LineSegment& lineSegment) const {
-	const int dx = static_cast<int>(lineSegment.slope.x * DELTA_MULTIPLIER);
-	const int dy = static_cast<int>(lineSegment.slope.y * DELTA_MULTIPLIER);
+	const auto dx = static_cast<int>(lineSegment.slope.x * DELTA_MULTIPLIER);
+	const auto dy = static_cast<int>(lineSegment.slope.y * DELTA_MULTIPLIER);
 
-	int x = lineSegment.start.position.x - dx;
-	int y = lineSegment.start.position.y - dy;
+	auto x = lineSegment.start.position.x - dx;
+	auto y = lineSegment.start.position.y - dy;
 
-	if (isPointInsideFrame(x, y)) {
-		if (isPixelWhite(x, y)) {
-			lineSegment.startCorner = true;
-		}
+	if (isPixelWhite(x, y)) {
+		lineSegment.startCorner = true;
 	}
-
+	
 	x = lineSegment.end.position.x + dx;
 	y = lineSegment.end.position.y + dy;
 
-	if (isPointInsideFrame(x, y)) {
-		if (isPixelWhite(x, y)) {
-			lineSegment.endCorner = true;
-		}
+	if (isPixelWhite(x, y)) {
+		lineSegment.endCorner = true;
 	}
 
 	return lineSegment.startCorner || lineSegment.endCorner;

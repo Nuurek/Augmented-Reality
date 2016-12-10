@@ -134,14 +134,14 @@ unsigned int EdgelDetector::edgeKernelY(size_t x, size_t y) const {
 }
 
 Vector2f EdgelDetector::edgelGradientIntensity(size_t x, size_t y) const {
-	int gradientX = buffer->getPixel(x - 1, y - 1);
+	float gradientX = buffer->getPixel(x - 1, y - 1);
 	gradientX += 2 * buffer->getPixel(x, y - 1);
 	gradientX += buffer->getPixel(x + 1, y - 1);
 	gradientX -= buffer->getPixel(x - 1, y + 1);
 	gradientX -= 2 * buffer->getPixel(x, y + 1);
 	gradientX -= buffer->getPixel(x + 1, y + 1);
 
-	int gradientY = buffer->getPixel(x - 1, y - 1);
+	float gradientY = buffer->getPixel(x - 1, y - 1);
 	gradientY += 2 * buffer->getPixel(x - 1, y);
 	gradientY += buffer->getPixel(x - 1, y + 1);
 	gradientY -= buffer->getPixel(x + 1, y - 1);

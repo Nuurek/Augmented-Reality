@@ -2,13 +2,13 @@
 #include "LineSegmentMerger.h"
 
 const float DELTA_MULTIPLIER = 4.0f;
-const unsigned char WHITE_THRESHOLD = 200.0f;
+const float WHITE_THRESHOLD = 10.0f;
 
 class CornersFinder :
 	public LineSegmentMerger {
 
 	bool isLineSegmentWithBorder(LineSegment& lineSegment) const;
-	inline bool isPixelWhite(size_t x, size_t y) const {
+	inline bool isPixelWhite(float x, float y) const {
 		return (
 			buffer->getPixelChannel(x, y, 0) > WHITE_THRESHOLD &&
 			buffer->getPixelChannel(x, y, 1) > WHITE_THRESHOLD &&
