@@ -9,7 +9,8 @@
 struct ARMarker {
 	std::array<Vector2f, 4> vertices;
 
-	std::vector<cv::Point2f> getVectorized();
+	std::vector<cv::Point2f> getVectorizedForOpenCV();
 
+	ARMarker(std::array<Vector2f, 4> newVertices);
 	ARMarker(Vector2f vertices[4]);
 };

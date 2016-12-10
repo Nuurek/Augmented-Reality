@@ -22,6 +22,23 @@ Vector2f LineSegment::getOrienation() {
 	return Vector2f(-start.slope.y, start.slope.x);
 }
 
+Vector2f LineSegment::getIntersection(LineSegment & rhs) const {
+	Vector2f intersection;
+
+	float denominator = ((rhs.end.position.y - rhs.start.position.y)*(end.position.x - start.position.x)) -
+		((rhs.end.position.x - rhs.start.position.x)*(end.position.y - start.position.y));
+
+	float numerator = ((rhs.end.position.x - rhs.start.position.x)*(start.position.y - rhs.start.position.y)) -
+		((rhs.end.position.y - rhs.start.position.y)*(start.position.x - rhs.start.position.x));
+
+	float center = numerator / denominator;
+
+	intersection.x = start.position.x + center * (end.position.x - start.position.x);
+	intersection.y = start.position.y + center * (end.position.y - start.position.y);
+
+	return intersection;
+}
+
 void LineSegment::swapEndPoints() {
 	std::swap(start, end);
 }

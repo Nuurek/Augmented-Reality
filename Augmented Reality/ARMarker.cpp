@@ -1,7 +1,7 @@
 #include "ARMarker.h"
 
 
-std::vector<cv::Point2f> ARMarker::getVectorized() {
+std::vector<cv::Point2f> ARMarker::getVectorizedForOpenCV() {
 	return std::vector<cv::Point2f>{
 		cv::Point2f(vertices[0].x, vertices[0].y),
 		cv::Point2f(vertices[1].x, vertices[1].y),
@@ -9,6 +9,9 @@ std::vector<cv::Point2f> ARMarker::getVectorized() {
 		cv::Point2f(vertices[3].x, vertices[3].y)
 	};
 }
+
+ARMarker::ARMarker(std::array<Vector2f, 4> newVertices) 
+	: vertices(std::move(newVertices)) {}
 
 ARMarker::ARMarker(Vector2f newVertices[4]) {
 	for (int i = 0; i < 4; i++) {

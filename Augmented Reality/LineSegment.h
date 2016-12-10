@@ -27,6 +27,7 @@ public:
 	bool coincide(Edgel& edgel);
 	Vector2f getStartEndSlope();
 	Vector2f getOrienation();
+	Vector2f getIntersection(LineSegment& rhs) const;
 	void swapEndPoints();
 	bool isOrientationCompatible(LineSegment& rhs) const;
 };

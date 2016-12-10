@@ -100,19 +100,14 @@ std::pair<bool, EndPoint> MarkerFinder::areSegmentsInChain(LineSegment & predece
 ARMarker MarkerFinder::convertChainToARMarker(std::vector<LineSegment>& chain) {
 	size_t size = chain.size();
 
-	Vector2f vertices[4];
+	std::array<Vector2f, 4> vertices;
 
 	for (size_t i = 0; i < size; i++) {
 		auto& predecessor = chain[i % size];
 		auto& successor = chain[(i + 1) % size];
 
-		auto isChain = areSegmentsInChain(predecessor, successor, true, EndPoint::NONE);
-
-		if (isChain.second == EndPoint::END) {
-			vertices[i] = successor.start.position;
-		} else {
-			vertices[i] = successor.end.position;
-		}
+		auto intersectionPoint = predecessor.getIntersection(successor);
+		vertices[i] = intersectionPoint;
 	}
 
 	return ARMarker(vertices);
