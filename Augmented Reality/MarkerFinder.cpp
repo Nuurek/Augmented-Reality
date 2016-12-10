@@ -81,14 +81,9 @@ std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWi
 			int length = 1;
 
 			// kijk eerst of er schakels voor dit element moeten...
-			findChainOfLines(chainSegment, true, linesWithCorners, chain, length);
+			findChainOfLines(chainSegment, linesWithCorners, chain, length);
 
 			chain.push_back(chainSegment);
-
-			// en misschien ook nog wel erna..
-			if (length < 4) {
-				//findChainOfLines(chainSegment, false, linesWithCorners, chain, length);
-			}
 
 			if (length > 3) {
 				markers.push_back(convertChainToARMarker(chain));
@@ -99,9 +94,9 @@ std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWi
 	return markers;
 }
 
-void MarkerFinder::findChainOfLines(LineSegment &startSegment, bool atStartPoint, std::vector<LineSegment> &linesegments, std::vector<LineSegment> &chain, int& length) {
+void MarkerFinder::findChainOfLines(LineSegment &startSegment, std::vector<LineSegment> &linesegments, std::vector<LineSegment> &chain, int& length) {
 	for (int i = 0; i<linesegments.size(); i++) {
-		if (!areSegmentsInChain(startSegment, linesegments[i], atStartPoint)) {
+		if (!areSegmentsInChain(startSegment, linesegments[i])) {
 			continue;
 		}
 
@@ -115,26 +110,20 @@ void MarkerFinder::findChainOfLines(LineSegment &startSegment, bool atStartPoint
 			chain.push_back(chainSegment);
 			return;
 		}
-
-		if (!atStartPoint) {
-			chain.push_back(chainSegment);
-		}
 		// recursie!
-		findChainOfLines(chainSegment, atStartPoint, linesegments, chain, length);
-		if (atStartPoint) {
-			chain.push_back(chainSegment);
-		}
+		findChainOfLines(chainSegment, linesegments, chain, length);
+		chain.push_back(chainSegment);
 		return;
 	}
 }
 
-bool MarkerFinder::areSegmentsInChain(const LineSegment& first, const LineSegment& second, bool atStartPoint) const {
+bool MarkerFinder::areSegmentsInChain(const LineSegment& first, const LineSegment& second) const {
 	if (first.isOrientationCompatible(second)) {
 		return false;
 	}
 
-	const auto& startPoint = atStartPoint ? first.start.position : first.end.position;
-	const auto& endPoint = atStartPoint ? second.end.position : second.start.position;
+	const auto& startPoint = first.start.position;
+	const auto& endPoint = second.end.position;
 
 	if ((endPoint - startPoint).get_squared_length() > CHAIN_MAX_GAP) {
 		return false;
@@ -142,7 +131,7 @@ bool MarkerFinder::areSegmentsInChain(const LineSegment& first, const LineSegmen
 
 	const float orientation = first.slope.x * second.slope.y - first.slope.y * second.slope.x;
 
-	if ((atStartPoint && orientation <= 0) || (!atStartPoint && orientation >= 0)) {
+	if (orientation <= 0) {
 		return false;
 	}
 
