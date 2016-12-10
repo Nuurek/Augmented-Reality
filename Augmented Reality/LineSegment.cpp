@@ -43,7 +43,7 @@ void LineSegment::swapEndPoints() {
 	std::swap(start, end);
 }
 
-bool LineSegment::isOrientationCompatible(LineSegment & rhs) const {
+bool LineSegment::isOrientationCompatible(const LineSegment & rhs) const {
 	return slope * rhs.slope > LINE_ORIENTATION_THRESHOLD;
 }
 

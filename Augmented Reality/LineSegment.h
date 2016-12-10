@@ -29,6 +29,6 @@ public:
 	Vector2f getOrienation();
 	Vector2f getIntersection(LineSegment& rhs) const;
 	void swapEndPoints();
-	bool isOrientationCompatible(LineSegment& rhs) const;
+	bool isOrientationCompatible(const LineSegment& rhs) const;
 };
 

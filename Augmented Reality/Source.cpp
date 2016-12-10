@@ -14,7 +14,7 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = false;
+const bool USE_CAMERA = true;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 	auto videoWriter = cv::VideoWriter();
 	if (WRITE_VIDEO) {
 		videoWriter.open(
-			WRITE_FILENAME, cv::VideoWriter::fourcc('P', 'I', 'M', '1'), FPS, cv::Size(FRAME_WIDTH, FRAME_HEIGHT)
+			WRITE_FILENAME, cv::VideoWriter::fourcc('P', 'I', 'M', '1'), static_cast<double>(FPS), cv::Size(FRAME_WIDTH, FRAME_HEIGHT)
 		);
 
 		if (!videoWriter.isOpened()) {

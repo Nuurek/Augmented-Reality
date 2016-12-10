@@ -49,54 +49,6 @@ std::vector<LineSegment> MarkerFinder::findMarker(std::list<LineSegment>& listOf
 }
 */
 
-std::pair<bool, EndPoint> MarkerFinder::areSegmentsInChain(LineSegment & predecessor, LineSegment & successor, bool isStart, EndPoint endPoint) {
-	// check if not parallel
-	if (predecessor.isOrientationCompatible(successor)) {
-		return std::make_pair<bool, EndPoint>(false, EndPoint::NONE);
-	}
-
-	// check if not to far away
-	auto predecessorStartPoint = predecessor.start.position;
-	auto predecessorEndPoint = predecessor.end.position;
-	auto successorStartPoint = successor.start.position;
-	auto successorEndPoint = successor.end.position;
-
-	bool isCloseEnough = false;
-	EndPoint newEndPoint = EndPoint::NONE;
-
-	if (isStart) {
-		if (((predecessorStartPoint - successorStartPoint).get_squared_length() < CHAIN_MAX_GAP) ||
-			((predecessorEndPoint - successorStartPoint).get_squared_length() < CHAIN_MAX_GAP)) {
-			isCloseEnough = true;
-			newEndPoint = EndPoint::END;
-		} else if (((predecessorStartPoint - successorEndPoint).get_squared_length() < CHAIN_MAX_GAP) ||
-			((predecessorEndPoint - successorEndPoint).get_squared_length() < CHAIN_MAX_GAP)) {
-			isCloseEnough = true;
-			newEndPoint = EndPoint::START;
-		}
-	} else {
-		if (endPoint == EndPoint::START) {
-			if ((predecessorStartPoint - successorStartPoint).get_squared_length() < CHAIN_MAX_GAP) {
-				isCloseEnough = true;
-				newEndPoint = EndPoint::END;
-			} else if ((predecessorStartPoint - successorEndPoint).get_squared_length() < CHAIN_MAX_GAP) {
-				isCloseEnough = true;
-				newEndPoint = EndPoint::START;
-			}
-		} else if (endPoint == EndPoint::END) {
-			if ((predecessorEndPoint - successorStartPoint).get_squared_length() < CHAIN_MAX_GAP) {
-				isCloseEnough = true;
-				newEndPoint = EndPoint::END;
-			} else if ((predecessorEndPoint - successorEndPoint).get_squared_length() < CHAIN_MAX_GAP) {
-				isCloseEnough = true;
-				newEndPoint = EndPoint::START;
-			}
-		}
-	}
-	
-	return std::pair<bool, EndPoint>(isCloseEnough, newEndPoint);
-}
-
 ARMarker MarkerFinder::convertChainToARMarker(std::vector<LineSegment>& chain) {
 	size_t size = chain.size();
 
@@ -117,56 +69,41 @@ ARMarker MarkerFinder::convertChainToARMarker(std::vector<LineSegment>& chain) {
 std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWithCorners) {
 	std::vector<ARMarker> markers;
 
-	do {
+	if (linesWithCorners.size() >= 4) {
+		do {
 
-		// pak een willekeurig segment, en probeer hier een chain mee te maken..
-		LineSegment chainSegment = linesWithCorners[0];
-		linesWithCorners[0] = linesWithCorners[linesWithCorners.size() - 1];
-		linesWithCorners.resize(linesWithCorners.size() - 1);
+			// pak een willekeurig segment, en probeer hier een chain mee te maken..
+			LineSegment chainSegment = linesWithCorners[0];
+			linesWithCorners[0] = linesWithCorners[linesWithCorners.size() - 1];
+			linesWithCorners.resize(linesWithCorners.size() - 1);
 
-		std::vector<LineSegment> chain;
-		int length = 1;
+			std::vector<LineSegment> chain;
+			int length = 1;
 
-		// kijk eerst of er schakels voor dit element moeten...
-		findChainOfLines(chainSegment, true, linesWithCorners, chain, length);
+			// kijk eerst of er schakels voor dit element moeten...
+			findChainOfLines(chainSegment, true, linesWithCorners, chain, length);
 
-		chain.push_back(chainSegment);
+			chain.push_back(chainSegment);
 
-		// en misschien ook nog wel erna..
-		if (length < 4) {
-			findChainOfLines(chainSegment, false, linesWithCorners, chain, length);
-		}
+			// en misschien ook nog wel erna..
+			if (length < 4) {
+				//findChainOfLines(chainSegment, false, linesWithCorners, chain, length);
+			}
 
-		if (length > 3) {
-			markers.push_back(convertChainToARMarker(chain));
-		}
-	} while (linesWithCorners.size());
+			if (length > 3) {
+				markers.push_back(convertChainToARMarker(chain));
+			}
+		} while (linesWithCorners.size());
+	}
 
 	return markers;
 }
 
 void MarkerFinder::findChainOfLines(LineSegment &startSegment, bool atStartPoint, std::vector<LineSegment> &linesegments, std::vector<LineSegment> &chain, int& length) {
-	const Vector2f startPoint = atStartPoint ? startSegment.start.position : startSegment.end.position;
-
 	for (int i = 0; i<linesegments.size(); i++) {
-		// lijnen mogen niet parallel liggen
-		if (startSegment.isOrientationCompatible(linesegments[i])) {
+		if (!areSegmentsInChain(startSegment, linesegments[i], atStartPoint)) {
 			continue;
 		}
-		// eind en startpunt moeten dicht bij elkaar liggen...
-		if ((startPoint - (atStartPoint ? linesegments[i].end.position : linesegments[i].start.position)).get_squared_length() > 16.0f) {
-			continue;
-		}
-		// en de orientatie moet natuurlijk goed zijn, dus tegen de klok mee rond een zwart vierkantje
-		if ((atStartPoint &&
-			(startSegment.slope.x * linesegments[i].slope.y - startSegment.slope.y * linesegments[i].slope.x <= 0)) ||
-			(!atStartPoint &&
-			(startSegment.slope.x * linesegments[i].slope.y - startSegment.slope.y * linesegments[i].slope.x >= 0))) {
-			continue;
-		}
-
-		// het lijkt te mooi om waar te zijn, maar we hebben er 1 gevonden :)
-		// haal dus dit segment er uit en kijk of de ketting langer te maken is...
 
 		length++;
 
@@ -189,4 +126,25 @@ void MarkerFinder::findChainOfLines(LineSegment &startSegment, bool atStartPoint
 		}
 		return;
 	}
+}
+
+bool MarkerFinder::areSegmentsInChain(const LineSegment& first, const LineSegment& second, bool atStartPoint) const {
+	if (first.isOrientationCompatible(second)) {
+		return false;
+	}
+
+	const auto& startPoint = atStartPoint ? first.start.position : first.end.position;
+	const auto& endPoint = atStartPoint ? second.end.position : second.start.position;
+
+	if ((endPoint - startPoint).get_squared_length() > CHAIN_MAX_GAP) {
+		return false;
+	}
+
+	const float orientation = first.slope.x * second.slope.y - first.slope.y * second.slope.x;
+
+	if ((atStartPoint && orientation <= 0) || (!atStartPoint && orientation >= 0)) {
+		return false;
+	}
+
+	return true;
 }
