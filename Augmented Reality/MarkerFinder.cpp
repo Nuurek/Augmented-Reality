@@ -80,12 +80,12 @@ std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWi
 			std::vector<LineSegment> chain;
 			int length = 1;
 
+			chain.push_back(chainSegment);
+
 			// kijk eerst of er schakels voor dit element moeten...
 			findChainOfLines(chainSegment, linesWithCorners, chain, length);
 
-			chain.push_back(chainSegment);
-
-			if (length > 3) {
+			if (chain.size() > 3) {
 				markers.push_back(convertChainToARMarker(chain));
 			}
 		} while (linesWithCorners.size());
@@ -94,27 +94,48 @@ std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWi
 	return markers;
 }
 
-void MarkerFinder::findChainOfLines(LineSegment &startSegment, std::vector<LineSegment> &linesegments, std::vector<LineSegment> &chain, int& length) {
-	for (int i = 0; i<linesegments.size(); i++) {
-		if (!areSegmentsInChain(startSegment, linesegments[i])) {
+void MarkerFinder::findChainOfLines(LineSegment &startSegment, std::vector<LineSegment> &lineSegments, std::vector<LineSegment> &chain, int& length) {
+	/*
+	for (int i = 0; i<lineSegments.size(); i++) {
+		if (!areSegmentsInChain(startSegment, lineSegments[i])) {
 			continue;
 		}
 
 		length++;
 
-		LineSegment chainSegment = linesegments[i];
-		linesegments[i] = linesegments[linesegments.size() - 1];
-		linesegments.resize(linesegments.size() - 1);
+		LineSegment chainSegment = lineSegments[i];
+		lineSegments[i] = lineSegments[lineSegments.size() - 1];
+		lineSegments.resize(lineSegments.size() - 1);
 
 		if (length == 4) {
 			chain.push_back(chainSegment);
 			return;
 		}
 		// recursie!
-		findChainOfLines(chainSegment, linesegments, chain, length);
+		findChainOfLines(chainSegment, lineSegments, chain, length);
 		chain.push_back(chainSegment);
 		return;
 	}
+	*/
+
+	bool nextSegmentFound = false;
+
+	do {
+		nextSegmentFound = false;
+
+		for (auto it = lineSegments.begin(); it != lineSegments.end(); ++it) {
+			if (areSegmentsInChain(startSegment, (*it))) {
+				LineSegment chainSegment = (*it);
+				lineSegments.erase(it);
+
+				chain.push_back(chainSegment);
+				startSegment = chainSegment;
+
+				nextSegmentFound = true;
+				break;
+			}
+		}
+	} while (nextSegmentFound && chain.size() < 4);
 }
 
 bool MarkerFinder::areSegmentsInChain(const LineSegment& first, const LineSegment& second) const {
