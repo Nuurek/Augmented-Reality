@@ -1,6 +1,6 @@
 #include "MarkerFinder.h"
 
-
+/*
 std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWithCorners) {
 	std::vector<ARMarker> markers;
 	std::vector<std::vector<LineSegment>> chains;
@@ -47,6 +47,7 @@ std::vector<LineSegment> MarkerFinder::findMarker(std::list<LineSegment>& listOf
 
 	return chain;
 }
+*/
 
 std::pair<bool, EndPoint> MarkerFinder::areSegmentsInChain(LineSegment & predecessor, LineSegment & successor, bool isStart, EndPoint endPoint) {
 	// check if not parallel
@@ -94,19 +95,6 @@ std::pair<bool, EndPoint> MarkerFinder::areSegmentsInChain(LineSegment & predece
 	}
 	
 	return std::pair<bool, EndPoint>(isCloseEnough, newEndPoint);
-	/*
-	// check if orientation is counterclockwise
-	float orientation = predecessor.slope.x * successor.slope.y - predecessor.slope.y * successor.slope.x;
-	if (!isStart) {
-		orientation *= -1.0f;
-	}
-
-	if (orientation <= 0.0f) {
-		return false;
-	}
-
-	return true;
-	*/
 }
 
 ARMarker MarkerFinder::convertChainToARMarker(std::vector<LineSegment>& chain) {
@@ -131,7 +119,6 @@ ARMarker MarkerFinder::convertChainToARMarker(std::vector<LineSegment>& chain) {
 }
 
 
-/*
 std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWithCorners) {
 	std::vector<ARMarker> markers;
 
@@ -155,10 +142,8 @@ std::vector<ARMarker> MarkerFinder::findMarkers(std::vector<LineSegment> linesWi
 			findChainOfLines(chainSegment, false, linesWithCorners, chain, length);
 		}
 
-		if (length > 2) {
-			ARMarker marker;
-
-			markers.push_back(marker);
+		if (length > 3) {
+			markers.push_back(convertChainToARMarker(chain));
 		}
 	} while (linesWithCorners.size());
 
@@ -210,4 +195,3 @@ void MarkerFinder::findChainOfLines(LineSegment &startSegment, bool atStartPoint
 		return;
 	}
 }
-*/

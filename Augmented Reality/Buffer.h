@@ -14,10 +14,19 @@ public:
 	inline unsigned int getWidth() { return width; }
 	inline unsigned int getHeight() { return height; }
 	inline unsigned char* getData() { return data; }
-	inline float getPixelChannel(size_t x, size_t y, size_t channel) {
-		return data[((x + (y * width)) * 3) + channel];
+	inline float getPixelChannel(float x, float y, size_t channel) {
+		int intX = static_cast<int>(x);
+		int intY = static_cast<int>(y);
+
+		intX = (intX < 0) ? 0 : intX;
+		intY = (intY < 0) ? 0 : intY;
+
+		intX = (intX > width - 1) ? (width - 1) : intX;
+		intY = (intY > height - 1) ? (height - 1) : intY;
+
+		return data[((intX + (intY * width)) * 3) + channel];
 	}
-	inline float getPixel(size_t x, size_t y) {
+	inline float getPixel(float x, float y) {
 		return getPixelChannel(x, y, 0);
 	}
 

@@ -81,13 +81,13 @@ bool LineSegmentMerger::isLineExtensible(Vector2f startPoint, Vector2f & endPoin
 	for (size_t step = 0; step < maxLength; step++) {
 		startPoint += slope;
 
-		if (isPointOutsideBorder(startPoint.x, startPoint.y)) {
+		if (edgeKernelX(startPoint.x, startPoint.y) < KERNEL_THRESHOLD / 2 &&
+			edgeKernelY(startPoint.x, startPoint.y) < KERNEL_THRESHOLD / 2) {
+			isExtensible = false;
 			break;
 		}
 
-		if (edgeKernelX(startPoint.x, startPoint.y) >= KERNEL_THRESHOLD / 2 ||
-			edgeKernelY(startPoint.x, startPoint.y) >= KERNEL_THRESHOLD / 2 ||
-			isGradientIntensive(startPoint, normal, gradient)) {
+		if (isGradientIntensive(startPoint, normal, gradient)) {
 			continue;
 		}
 

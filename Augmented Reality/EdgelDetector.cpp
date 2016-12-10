@@ -116,13 +116,21 @@ unsigned int EdgelDetector::edgeKernel(unsigned char* offset, size_t pitch) cons
 }
 
 unsigned int EdgelDetector::edgeKernelX(size_t x, size_t y) const {
-	size_t pitch = buffer->getWidth() * NUMBER_OF_CHANNELS;
-	return edgeKernel(calcualteOffset(x, y), pitch);
+	float kernel = -3 * buffer->getPixel(x, y - 2);
+	kernel += -5 * buffer->getPixel(x, y - 1);
+	kernel += 5 * buffer->getPixel(x, y + 1);
+	kernel += 3 * buffer->getPixel(x, y + 2);
+
+	return abs(static_cast<int>(kernel));
 }
 
 unsigned int EdgelDetector::edgeKernelY(size_t x, size_t y) const {
-	size_t pitch = NUMBER_OF_CHANNELS;
-	return edgeKernel(calcualteOffset(x, y), pitch);
+	float kernel = -3 * buffer->getPixel(x - 2, y);
+	kernel += -5 * buffer->getPixel(x - 1, y);
+	kernel += 5 * buffer->getPixel(x + 1, y);
+	kernel += 3 * buffer->getPixel(x + 2, y);
+
+	return abs(static_cast<int>(kernel));
 }
 
 Vector2f EdgelDetector::edgelGradientIntensity(size_t x, size_t y) const {
