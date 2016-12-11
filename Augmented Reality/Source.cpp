@@ -16,7 +16,7 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = false;
+const bool USE_CAMERA = true;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -116,7 +116,6 @@ int main(int argc, char** argv) {
 			decorator.drawLineSegments(frame, extendedLineSegments);
 		}
 
-
 		if (keyManager.isActive("lineSegmentsWithCorner")) {
 			auto lineSegmentsWithCorner = detector.getLineSegmentsWithCorner();
 			decorator.drawLineSegments(frame, lineSegmentsWithCorner);
@@ -126,14 +125,17 @@ int main(int argc, char** argv) {
 			auto markers = detector.getARMarkers();
 			decorator.drawARMarkers(frame, markers);
 		}
-
 		if (keyManager.isActive("poseFinderExample")) {
-			std::vector<cv::Point2f> imagePoints = PoseFinder::getExample2DPoints();
-			for (auto point = imagePoints.begin(); point != imagePoints.end(); point++)
-				cv::circle(frame, *point, 5, CV_RGB(0, 255, 255), -1);
-			cameraMatrix = PoseFinder::findPose(PoseFinder::getExample2DPoints(), PoseFinder::getExample3DPoints());
-			for (auto point = PoseFinder::projectedPoints.begin(); point != PoseFinder::projectedPoints.end(); point++)
-				cv::circle(frame, *point, 5, CV_RGB(150, 0, 255), -1);
+			for (auto& marker : detector.getARMarkers()) {
+				auto imagePoints = marker.getVectorizedForOpenCV();
+				for (auto& imagePoint : imagePoints) {
+					cv::circle(frame, imagePoint, 5, CV_RGB(0, 255, 255), -1);
+				}
+				cameraMatrix = PoseFinder::findPose(imagePoints, PoseFinder::getExample3DPoints());
+				for (auto& imagePoint : PoseFinder::projectedPoints) {
+					cv::circle(frame, imagePoint, 5, CV_RGB(150, 0, 255), -1);
+				}
+			}
 		}
 		else {
 			cameraMatrix = glm::lookAt( //Wylicz macierz widoku

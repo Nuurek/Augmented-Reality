@@ -17,6 +17,8 @@ PoseFinder::~PoseFinder()
 std::vector<cv::Point2f> PoseFinder::projectedPoints;
 glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector<cv::Point3f> objectPoints)
 {
+	projectedPoints.clear();
+
 	std::cout << "There are " << imagePoints.size() << " imagePoints and " << objectPoints.size() << " objectPoints." << std::endl;
 	cv::Mat cameraMatrix(3, 3, cv::DataType<double>::type);
 	cv::setIdentity(cameraMatrix);

@@ -48,7 +48,7 @@ GLuint ShaderProgram::loadShader(GLenum shaderType,char* fileName) {
 	//Skompiluj źródło
 	glCompileShader(shader);
 	//Usuń źródło shadera z pamięci (nie będzie już potrzebne)
-	delete []shaderSource;
+	//delete []shaderSource;
 	
 	//Pobierz log błędów kompilacji i wyświetl
 	int infologLength = 0;
