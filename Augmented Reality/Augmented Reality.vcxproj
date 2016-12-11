@@ -169,6 +169,7 @@
     <ClCompile Include="LineSegmentExtender.cpp" />
     <ClCompile Include="LineSegmentMerger.cpp" />
     <ClCompile Include="lodepng.cpp" />
+    <ClCompile Include="MarkerFinder.cpp" />
     <ClCompile Include="PoseFinder.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
