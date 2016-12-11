@@ -8,6 +8,7 @@
 class PoseFinder
 {
 public:
+	static std::vector<cv::Point2f> projectedPoints;
 	PoseFinder();
 	~PoseFinder();
 	static glm::mat4 findPose(std::vector<cv::Point2f> imagePoints, std::vector<cv::Point3f> objectPoints);

@@ -153,30 +153,30 @@ void Drawer::drawScene(cv::Mat *frame, glm::mat4 cameraMatrix) {
 	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
 
 	//tex0 = frame.data;
-	readFrame(frame, currentFrameTex);
 
+	readFrame(frame, currentFrameTex);
 	//Narysuj obiekt
-	drawObject(vao, shaderProgram, P, cameraMatrix, M, model);
+	drawObject(vao, shaderProgram, P, cameraMatrix, M, model, tex0);
 	//model.drawSolid();
 
 	//draw backgroud
 
-	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel);
+	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel, currentFrameTex);
 
 
 	//Przerzuæ tylny bufor na przedni
 	glfwSwapBuffers(window);
 
 }
-void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, Models::Model object) {
+void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, Models::Model object, GLuint texture) {
 	shader->use();
 
 	glUniformMatrix4fv(shader->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
 	glUniformMatrix4fv(shader->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
 	glUniformMatrix4fv(shader->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
-
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, currentFrameTex);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
 	//Uaktywnienie VAO i tym samym uaktywnienie predefiniowanych w tym VAO powi¹zañ slotów atrybutów z tablicami z danymi
 	glBindVertexArray(vao);
 

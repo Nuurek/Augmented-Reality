@@ -7,5 +7,5 @@ out vec4 pixelColor;
 
 void main(void) {
 	pixelColor = texture(textureMap0,iTexCoord0);
-	pixelColor = vec4(1,1,1,0);
+	//pixelColor = vec4(1,1,1,0);
 }

@@ -116,6 +116,8 @@ int main(int argc, char** argv) {
 			for (auto point = imagePoints.begin(); point != imagePoints.end(); point++)
 				cv::circle(frame, *point, 5, CV_RGB(0, 255, 255), -1);
 			cameraMatrix = PoseFinder::findPose(PoseFinder::getExample2DPoints(), PoseFinder::getExample3DPoints());
+			for (auto point = PoseFinder::projectedPoints.begin(); point != PoseFinder::projectedPoints.end(); point++)
+				cv::circle(frame, *point, 5, CV_RGB(150, 0, 255), -1);
 		}
 		else {
 			cameraMatrix = glm::lookAt( //Wylicz macierz widoku

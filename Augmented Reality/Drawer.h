@@ -23,7 +23,7 @@ public:
 	GLFWwindow* getWindow();
 	
 private:
-	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM, Models::Model object);
+	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM, Models::Model object, GLuint texture);
 	void initOpenGLProgram(GLFWwindow * window);
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
@@ -38,7 +38,7 @@ private:
 	ShaderProgram *backgroundShaderProgram;
 	GLuint vao;
 	GLuint backgroundVAO;
-	Models::Model model = Models::teapot;
+	Models::Model model = Models::cube;
 	Models::Model backgroundModel = Models::quad;
 	const float PI = 3.141592653589793f; 
 	GLFWwindow* window;
