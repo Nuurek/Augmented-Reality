@@ -2,12 +2,14 @@
 #include <iostream>
 #include <string>
 #include <chrono>
-
+#include "PoseFinder.h"
+#include "Drawer.h"
 #include "Buffer.h"
 #include "ARMarkerDetector.h"
 #include "KeyManager.h"
 #include "FrameDecorator.h"
 
+#define GLM_FORCE_RADIANS
 
 const unsigned int FPS = 30;
 const unsigned int FRAME_WIDTH = 640;
@@ -44,7 +46,9 @@ int main(int argc, char** argv) {
 		cv::resize(exampleImage, exampleImage, cv::Size(FRAME_WIDTH, FRAME_HEIGHT));
 	}
 
-	cv::namedWindow(WINDOW_NAME);
+	//cv::namedWindow(WINDOW_NAME);
+	Drawer drawer;
+	drawer.init(FRAME_WIDTH,FRAME_HEIGHT);
 
 	auto videoWriter = cv::VideoWriter();
 	if (WRITE_VIDEO) {
@@ -62,11 +66,14 @@ int main(int argc, char** argv) {
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
 	KeyManager keyManager;
+	keyManager.init(drawer.getWindow());
 
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
-
-	while (true) {
+	bool isRunning=true;
+	glfwSetTime(0);
+	glm::mat4 cameraMatrix = glm::mat4(1.0f);
+	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
 		} else {
@@ -120,16 +127,33 @@ int main(int argc, char** argv) {
 			decorator.drawARMarkers(frame, markers);
 		}
 
+		if (keyManager.isActive("poseFinderExample")) {
+			std::vector<cv::Point2f> imagePoints = PoseFinder::getExample2DPoints();
+			for (auto point = imagePoints.begin(); point != imagePoints.end(); point++)
+				cv::circle(frame, *point, 5, CV_RGB(0, 255, 255), -1);
+			cameraMatrix = PoseFinder::findPose(PoseFinder::getExample2DPoints(), PoseFinder::getExample3DPoints());
+			for (auto point = PoseFinder::projectedPoints.begin(); point != PoseFinder::projectedPoints.end(); point++)
+				cv::circle(frame, *point, 5, CV_RGB(150, 0, 255), -1);
+		}
+		else {
+			cameraMatrix = glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(2.0f, 2.0f, 2.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(-1.0f, -1.0f, 1.0f));
+		}
+
+		if (keyManager.isActive("escape")) 
+			glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
+
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
 
-		cv::imshow(WINDOW_NAME, frame);
-		auto keyCode = cv::waitKey(1000 / FPS);
-		if (keyCode == 'q') {
-			return EXIT_SUCCESS;
-		} else {
-			keyManager.keyPressed(keyCode);
-		}
+		//cv::imshow(WINDOW_NAME, frame);
+		glfwSetTime(0);
+		drawer.drawScene(&frame, cameraMatrix);
+		keyManager.handleEvents();
 	}
+
+	return EXIT_SUCCESS;
 }
