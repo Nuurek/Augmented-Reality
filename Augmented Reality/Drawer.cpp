@@ -140,7 +140,7 @@ void Drawer::drawScene(cv::Mat *frame, glm::mat4 cameraMatrix) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
 
-	glm::mat4 P = glm::perspective(50 * PI / 180, 4.f/3.f, 1.0f, 50.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(33.7f, 4.f/3.f, 0.1f, 100.0f); //Wylicz macierz rzutowania
 
 	
 	//glm::mat4 V = glm::lookAt( //Wylicz macierz widoku

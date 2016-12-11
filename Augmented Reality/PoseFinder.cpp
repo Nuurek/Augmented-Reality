@@ -48,7 +48,6 @@ glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector
 	cv::Mat rotation, viewMatrix(4, 4, CV_64F);
 
 	cv::Rodrigues(rvec, rotation);
-
 	for (unsigned int row = 0; row<3; ++row)
 	{
 		for (unsigned int col = 0; col<3; ++col)
@@ -65,7 +64,11 @@ glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector
 	cvToGl.at<double>(2, 2) = -1.0f; // invert the z axis 
 	cvToGl.at<double>(3, 3) = 1.0f; 
 
+	cv::Mat cvToGl2 = (cv::Mat_<double>(4, 4) << 1,1,1,1,   -1,-1,-1,-1,    -1,-1,-1,-1,     1,1,1,1);
+
 	viewMatrix = cvToGl * viewMatrix;
+	//or
+	//viewMatrix = viewMatrix * cvToGl2;
 
 	cv::Mat glViewMatrix = cv::Mat::zeros(4, 4, CV_64F);
 
@@ -85,17 +88,18 @@ std::vector<cv::Point2f> PoseFinder::getExample2DPoints()
 	std::vector<cv::Point2f> points;
 
 	float x, y;
-	x = 282; y = 274;
+	x = 314; y = 231;
 	points.push_back(cv::Point2f(x, y));
 
-	x = 397; y = 227;
+	x = 461; y = 231;
 	points.push_back(cv::Point2f(x, y));
 
-	x = 577; y = 271;
+	x = 457; y = 368;
 	points.push_back(cv::Point2f(x, y));
 
-	x = 462; y = 318;
+	x = 299; y = 367;
 	points.push_back(cv::Point2f(x, y));
+
 
 	x = 270; y = 479;
 	//points.push_back(cv::Point2f(x, y));
@@ -115,17 +119,18 @@ std::vector<cv::Point3f> PoseFinder::getExample3DPoints()
 
 	float x, y, z;
 
+	x = -1.; y = 1.; z = -1.;
+	points.push_back(cv::Point3f(x, y, z));
+
 	x = 1.; y = 1.; z = -1.;
 	points.push_back(cv::Point3f(x, y, z));
 
-	x = 1.; y = 1.; z = 1.;
+	x = 1.; y = -1.; z = -1.;
 	points.push_back(cv::Point3f(x, y, z));
 
-	x = -1.; y = 1.; z = 1.;
+	x = -1.; y = -1.; z = -1.;
 	points.push_back(cv::Point3f(x, y, z));
 
-	x = -1.; y = 1.; z = -1.;
-	points.push_back(cv::Point3f(x, y, z));
 
 	x = 1.; y = -1.; z = -1.;
 	//points.push_back(cv::Point3f(x, y, z));
