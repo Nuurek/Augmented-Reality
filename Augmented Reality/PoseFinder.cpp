@@ -99,16 +99,6 @@ std::vector<cv::Point2f> PoseFinder::getExample2DPoints()
 
 	x = 299; y = 367;
 	points.push_back(cv::Point2f(x, y));
-
-
-	x = 270; y = 479;
-	//points.push_back(cv::Point2f(x, y));
-
-	x = 450; y = 523;
-	//points.push_back(cv::Point2f(x, y));
-
-	x = 566; y = 475;
-	//points.push_back(cv::Point2f(x, y));
 	return points;
 
 }
@@ -130,16 +120,6 @@ std::vector<cv::Point3f> PoseFinder::getExample3DPoints()
 
 	x = -1.; y = -1.; z = -1.;
 	points.push_back(cv::Point3f(x, y, z));
-
-
-	x = 1.; y = -1.; z = -1.;
-	//points.push_back(cv::Point3f(x, y, z));
-
-	x = -.5; y = -.5; z = -.5;
-	//points.push_back(cv::Point3f(x, y, z));
-
-	x = -.5; y = -.5; z = .5;
-	//points.push_back(cv::Point3f(x, y, z));
 
 	return points;
 }
