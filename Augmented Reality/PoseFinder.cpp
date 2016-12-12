@@ -6,40 +6,29 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "glm/gtx/string_cast.hpp"
 
-PoseFinder::PoseFinder()
-{
+PoseFinder::PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize)
+	: RegionBasedOperator(borderSize, regionSize, stepSize) {
 }
 
-
-PoseFinder::~PoseFinder()
-{
-}
 std::vector<cv::Point2f> PoseFinder::projectedPoints;
-glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector<cv::Point3f> objectPoints)
+std::vector<cv::Point2f> PoseFinder::findPose(std::vector<cv::Point3f> objectPoints, std::vector<cv::Point2f> imagePoints)
 {
-	projectedPoints.clear();
+	cv::Mat rotationVector;
+	cv::Mat translationVector;
+	
+	cv::solvePnPRansac(objectPoints, imagePoints, cameraMatrix, distCoeffs, rotationVector, translationVector);
 
-	std::cout << "There are " << imagePoints.size() << " imagePoints and " << objectPoints.size() << " objectPoints." << std::endl;
-	cv::Mat cameraMatrix(3, 3, cv::DataType<double>::type);
-	cv::setIdentity(cameraMatrix);
+	std::vector<cv::Point3f> topOfCube3DPoints = getTopOfTheCube3DPoints();
+	std::vector<cv::Point2f> topOfCubeProjectedPoints;
 
-	std::cout << "Initial cameraMatrix: " << cameraMatrix << std::endl;
+	cv::projectPoints(topOfCube3DPoints, rotationVector, translationVector, cameraMatrix, distCoeffs, topOfCubeProjectedPoints);
 
-	cv::Mat distCoeffs(4, 1, cv::DataType<double>::type);
-	distCoeffs.at<double>(0) = 0;
-	distCoeffs.at<double>(1) = 0;
-	distCoeffs.at<double>(2) = 0;
-	distCoeffs.at<double>(3) = 0;
+	return topOfCubeProjectedPoints;
 
-	cv::Mat rvec(3, 1, CV_64F);
-	cv::Mat tvec(3, 1, CV_64F);
-
-	cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec);
-
-	std::cout << "rvec: " << rvec << std::endl;
-	std::cout << "tvec: " << tvec << std::endl;
-
-	cv::projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, projectedPoints);
+	/*
+	auto axis = std::vector<cv::Point3f>{ { 0.0, 0.0, 0.0 },{ 0.0, 1.0, 0.0 },{ 1.0, 1.0, 0.0 },{ 1.0, 0.0, 0.0 },
+	{ 0.0, 0.0, -1.0 },{ 0.0, 1.0, -1.0 },{ 1.0, 1.0, -1.0 },{ 1.0, 0.0, -1.0 } };
+	cv::projectPoints(axis, rvec, tvec, cameraMatrix, distCoeffs, projectedPoints);
 
 	for (unsigned int i = 0; i < projectedPoints.size(); ++i)
 	{
@@ -83,45 +72,21 @@ glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector
 	std::cout<<"result " << glm::to_string(result) << "\n";
 	
 	return result;
+	*/
 }
 
-std::vector<cv::Point2f> PoseFinder::getExample2DPoints()
-{
-	std::vector<cv::Point2f> points;
+void PoseFinder::calibrateCamera(std::vector<std::vector<cv::Point3f>> objectPointsPatterns, std::vector<std::vector<cv::Point2f>> imagePointsPatters) {
+	cv::Mat rotationVector;
+	cv::Mat translationVector;
 
-	float x, y;
-	x = 314; y = 231;
-	points.push_back(cv::Point2f(x, y));
-
-	x = 461; y = 231;
-	points.push_back(cv::Point2f(x, y));
-
-	x = 457; y = 368;
-	points.push_back(cv::Point2f(x, y));
-
-	x = 299; y = 367;
-	points.push_back(cv::Point2f(x, y));
-	return points;
-
+	cv::calibrateCamera(objectPointsPatterns, imagePointsPatters, cv::Size(buffer->getWidth(), buffer->getHeight()), cameraMatrix, distCoeffs,
+		rotationVector, translationVector);
 }
 
-std::vector<cv::Point3f> PoseFinder::getExample3DPoints()
-{
-	std::vector<cv::Point3f> points;
+std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints() {
+	return std::vector<cv::Point3f>{ {0.0, 0.0, 0.0}, { 1.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0 }, { 0.0, 1.0, 0.0 }};
+}
 
-	float x, y, z;
-
-	x = -1.; y = 1.; z = -1.;
-	points.push_back(cv::Point3f(x, y, z));
-
-	x = 1.; y = 1.; z = -1.;
-	points.push_back(cv::Point3f(x, y, z));
-
-	x = 1.; y = -1.; z = -1.;
-	points.push_back(cv::Point3f(x, y, z));
-
-	x = -1.; y = -1.; z = -1.;
-	points.push_back(cv::Point3f(x, y, z));
-
-	return points;
+std::vector<cv::Point3f> PoseFinder::getTopOfTheCube3DPoints() {
+	return std::vector<cv::Point3f>{ { 0.0, 0.0, -1.0 }, { 1.0, 0.0, -1.0 }, { 1.0, 1.0, -1.0 }, { 0.0, 1.0, -1.0 }};
 }

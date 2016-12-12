@@ -38,7 +38,7 @@ char* ShaderProgram::readFile(char* fileName) {
 }
 
 //Metoda wczytuje i kompiluje shader, a następnie zwraca jego uchwyt
-GLuint ShaderProgram::loadShader(GLenum shaderType,char* fileName) {
+GLuint ShaderProgram::loadShader(GLenum shaderType, char* fileName) {
 	//Wygeneruj uchwyt na shader
 	GLuint shader=glCreateShader(shaderType);//shaderType to GL_VERTEX_SHADER, GL_GEOMETRY_SHADER lub GL_FRAGMENT_SHADER
 	//Wczytaj plik ze źródłem shadera do tablicy znaków
@@ -48,7 +48,7 @@ GLuint ShaderProgram::loadShader(GLenum shaderType,char* fileName) {
 	//Skompiluj źródło
 	glCompileShader(shader);
 	//Usuń źródło shadera z pamięci (nie będzie już potrzebne)
-	//delete []shaderSource;
+	delete []shaderSource;
 	
 	//Pobierz log błędów kompilacji i wyświetl
 	int infologLength = 0;

@@ -18,11 +18,16 @@ Drawer::~Drawer()
 	freeOpenGLProgram();
 }
 
+//Procedura obs³ugi b³êdów
+void error_callback(int error, const char* description) {
+	fputs(description, stderr);
+}
+
 void Drawer::init(int frameWidth, int frameHeight)
 {
 	GLFWwindow* window; //WskaŸnik na obiekt reprezentuj¹cy okno
 
-	//glfwSetErrorCallback(error_callback); //Zarejestruj procedurê obs³ugi b³êdów
+	glfwSetErrorCallback(error_callback); //Zarejestruj procedurê obs³ugi b³êdów
 
 	if (!glfwInit()) { //Zainicjuj bibliotekê GLFW
 		fprintf(stderr, "Nie mo¿na zainicjowaæ GLFW.\n");
@@ -48,10 +53,7 @@ void Drawer::init(int frameWidth, int frameHeight)
 	this->window = window;
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
 }
-//Procedura obs³ugi b³êdów
-void error_callback(int error, const char* description) {
-	fputs(description, stderr);
-}
+
 void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który nale¿y wykonaæ raz, na pocz¹tku programu************
 	glClearColor(0, 0, 1, 1); //Czyœæ ekran na czarno	

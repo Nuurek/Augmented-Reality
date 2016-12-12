@@ -8,6 +8,7 @@
 #include "ARMarkerDetector.h"
 #include "KeyManager.h"
 #include "FrameDecorator.h"
+#include "PoseFinder.h"
 
 #define GLM_FORCE_RADIANS
 
@@ -16,7 +17,7 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = true;
+const bool USE_CAMERA = false;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -71,6 +72,10 @@ int main(int argc, char** argv) {
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	bool isRunning=true;
+
+	PoseFinder poseFinder(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
+	poseFinder.setBuffer(&buffer);
+
 	glfwSetTime(0);
 	glm::mat4 cameraMatrix = glm::mat4(1.0f);
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
@@ -126,14 +131,27 @@ int main(int argc, char** argv) {
 			decorator.drawARMarkers(frame, markers);
 		}
 		if (keyManager.isActive("poseFinderExample")) {
-			for (auto& marker : detector.getARMarkers()) {
+			auto markers = detector.getARMarkers();
+			auto numberOfMarkers = markers.size();
+			auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
+			auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
+
+			for (auto& marker : markers) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
+				imagePointsPatterns.push_back(imagePoints);
+
 				for (auto& imagePoint : imagePoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(0, 255, 255), -1);
+					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
 				}
-				cameraMatrix = PoseFinder::findPose(imagePoints, PoseFinder::getExample3DPoints());
-				for (auto& imagePoint : PoseFinder::projectedPoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(150, 0, 255), -1);
+			}
+
+			poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
+
+			for (auto& marker : markers) {
+				auto bottomImagePoints = marker.getVectorizedForOpenCV();
+				auto topImagePoints = poseFinder.findPose(PoseFinder::getBottomOfTheCube3DPoints(), bottomImagePoints);
+				for (auto& imagePoint : topImagePoints) {
+					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
 			}
 		}
