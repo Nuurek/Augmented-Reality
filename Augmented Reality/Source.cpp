@@ -145,11 +145,11 @@ int main(int argc, char** argv) {
 				}
 			}
 
-			poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
+			auto cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
 
 			for (auto& marker : markers) {
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
-				auto topImagePoints = poseFinder.findPose(PoseFinder::getBottomOfTheCube3DPoints(), bottomImagePoints);
+				auto topImagePoints = poseFinder.findPose(cameraCalibration, PoseFinder::getBottomOfTheCube3DPoints(), bottomImagePoints);
 				for (auto& imagePoint : topImagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}

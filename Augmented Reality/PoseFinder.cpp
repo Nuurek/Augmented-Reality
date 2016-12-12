@@ -11,17 +11,18 @@ PoseFinder::PoseFinder(const size_t borderSize, const size_t regionSize, const s
 }
 
 std::vector<cv::Point2f> PoseFinder::projectedPoints;
-std::vector<cv::Point2f> PoseFinder::findPose(std::vector<cv::Point3f> objectPoints, std::vector<cv::Point2f> imagePoints)
+std::vector<cv::Point2f> PoseFinder::findPose(CameraCalibration cameraCalibration, VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints)
 {
-	cv::Mat rotationVector;
-	cv::Mat translationVector;
+	TransformationMatrix transformationMatrix;
 	
-	cv::solvePnPRansac(objectPoints, imagePoints, cameraMatrix, distCoeffs, rotationVector, translationVector);
+	cv::solvePnPRansac(objectPoints, imagePoints, cameraCalibration.cameraMatrix, 
+		cameraCalibration.distCoeffs, transformationMatrix.rotationMatrix, transformationMatrix.translationMatrix);
 
-	std::vector<cv::Point3f> topOfCube3DPoints = getTopOfTheCube3DPoints();
-	std::vector<cv::Point2f> topOfCubeProjectedPoints;
+	VectorOf3DPoints topOfCube3DPoints = getTopOfTheCube3DPoints();
+	VectorOf2DPoints topOfCubeProjectedPoints;
 
-	cv::projectPoints(topOfCube3DPoints, rotationVector, translationVector, cameraMatrix, distCoeffs, topOfCubeProjectedPoints);
+	cv::projectPoints(topOfCube3DPoints, transformationMatrix.rotationMatrix, transformationMatrix.translationMatrix,
+		cameraCalibration.cameraMatrix, cameraCalibration.distCoeffs, topOfCubeProjectedPoints);
 
 	return topOfCubeProjectedPoints;
 
@@ -75,12 +76,17 @@ std::vector<cv::Point2f> PoseFinder::findPose(std::vector<cv::Point3f> objectPoi
 	*/
 }
 
-void PoseFinder::calibrateCamera(std::vector<std::vector<cv::Point3f>> objectPointsPatterns, std::vector<std::vector<cv::Point2f>> imagePointsPatters) {
+CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters) {
+	CameraCalibration cameraCalibration;
+	
 	cv::Mat rotationVector;
 	cv::Mat translationVector;
 
-	cv::calibrateCamera(objectPointsPatterns, imagePointsPatters, cv::Size(buffer->getWidth(), buffer->getHeight()), cameraMatrix, distCoeffs,
+	cv::calibrateCamera(objectPointsPatterns, imagePointsPatters, cv::Size(buffer->getWidth(), buffer->getHeight()), 
+		cameraCalibration.cameraMatrix, cameraCalibration.distCoeffs,
 		rotationVector, translationVector);
+
+	return cameraCalibration;
 }
 
 std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints() {

@@ -8,17 +8,28 @@
 
 #include "RegionBasedOperator.h"
 
+struct CameraCalibration {
+	cv::Mat cameraMatrix;
+	cv::Mat distCoeffs;
+};
+
+struct TransformationMatrix {
+	cv::Mat rotationMatrix;
+	cv::Mat translationMatrix;
+};
+
 class PoseFinder 
 	: public RegionBasedOperator
 {
-	cv::Mat cameraMatrix;
-	cv::Mat distCoeffs;
-
 public:
+	using VectorOf3DPoints = std::vector<cv::Point3f>;
+	using VectorOf2DPoints = std::vector<cv::Point2f>;
+
+
 	static std::vector<cv::Point2f> projectedPoints;
 	PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize);
-	std::vector<cv::Point2f> findPose(std::vector<cv::Point3f> objectPoints, std::vector<cv::Point2f> imagePoints);
-	void calibrateCamera(std::vector<std::vector<cv::Point3f>> objectPointsPatterns, std::vector<std::vector<cv::Point2f>> imagePointsPatters);
+	VectorOf2DPoints findPose(CameraCalibration cameraCalibration, VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints);
+	CameraCalibration calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters);
 	static std::vector<cv::Point3f> getBottomOfTheCube3DPoints();
 	static std::vector<cv::Point3f> getTopOfTheCube3DPoints();
 };
