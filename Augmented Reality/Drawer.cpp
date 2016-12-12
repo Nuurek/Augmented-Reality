@@ -114,7 +114,7 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	glDeleteBuffers(1, &bufNormals); //Usuniêcie VBO z wektorami normalnymi
 	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
 
-	tex0 = readTexture("testTex.png");
+	tex0 = readTexture("cubeTex.png");
 	currentFrameTex = initFrameTexture();
 
 }
@@ -135,31 +135,18 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 	return handle;
 }
 //Procedura rysuj¹ca zawartoœæ sceny
-void Drawer::drawScene(cv::Mat *frame, glm::mat4 cameraMatrix) {
+void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix) {
 	//************Tutaj umieszczaj kod rysuj¹cy obraz******************l
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
 
-	glm::mat4 P = glm::perspective(33.7f, 4.f/3.f, 0.1f, 100.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(glm::radians(50.f), 4.f/3.f, 0.01f, 1000.0f); //Wylicz macierz rzutowania
 
-	
-	//glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
-	//	glm::vec3(20.0f, 0.0f, 0.0f),
-	//	glm::vec3(0.0f, 0.0f, 1.0f),
-	//	glm::vec3(0.0f, -1.0f, 0.0f));
-	//Wylicz macierz modelu rysowanego obiektu
 	glm::mat4 M = glm::mat4(1.0f);
 
-	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
-
-	//tex0 = frame.data;
-
 	readFrame(frame, currentFrameTex);
-	//Narysuj obiekt
-	drawObject(vao, shaderProgram, P, cameraMatrix, M, model, tex0);
-	//model.drawSolid();
-
-	//draw backgroud
+	for(auto cam=cameraMatrix.begin();cam!=cameraMatrix.end();cam++)
+		drawObject(vao, shaderProgram, P, *cam, M, model, tex0);
 
 	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel, currentFrameTex);
 

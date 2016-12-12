@@ -47,7 +47,7 @@ glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector
 
 	}
 
-	cv::Mat rotation, viewMatrix(4, 4, CV_64F);
+	cv::Mat rotation, viewMatrix= cv::Mat::zeros(4, 4, CV_64FC1);
 
 	cv::Rodrigues(rvec, rotation);
 	for (unsigned int row = 0; row<3; ++row)
@@ -58,9 +58,13 @@ glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector
 		}
 		viewMatrix.at<double>(row, 3) = tvec.at<double>(row, 0);
 	}
+	viewMatrix.at<double>(3, 0) = 0.0f;
+	viewMatrix.at<double>(3, 1) = 0.0f;
+	viewMatrix.at<double>(3, 2) = 0.0f;
 	viewMatrix.at<double>(3, 3) = 1.0f;
-
+	std::cout << "view Mat :" << viewMatrix << "\n";
 	cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_64F); 
+
 	cvToGl.at<double>(0, 0) = 1.0f; 
 	cvToGl.at<double>(1, 1) = -1.0f;// Invert the y axis 
 	cvToGl.at<double>(2, 2) = -1.0f; // invert the z axis 
@@ -68,20 +72,37 @@ glm::mat4 PoseFinder::findPose(std::vector<cv::Point2f> imagePoints, std::vector
 
 	cv::Mat cvToGl2 = (cv::Mat_<double>(4, 4) << 1,1,1,1,   -1,-1,-1,-1,    -1,-1,-1,-1,     1,1,1,1);
 
-	viewMatrix = cvToGl * viewMatrix;
+	viewMatrix = cvToGl * viewMatrix ;
 	//or
 	//viewMatrix = viewMatrix * cvToGl2;
 
 	cv::Mat glViewMatrix = cv::Mat::zeros(4, 4, CV_64F);
 
-	cv::transpose(viewMatrix, glViewMatrix);
+	//cv::transpose(viewMatrix, glViewMatrix);
+
 
 	glm::mat4 result(1.0);
 	for (int i = 0; i <= 3; i++)
 		for (int j = 0; j <= 3; j++)
-			result[i][j] = glViewMatrix.at<double>(i,j);
-	std::cout<<"result " << glm::to_string(result) << "\n";
-	
+			result[i][j] = viewMatrix.at<double>(j,i);
+
+	//result = glm::transpose(result);
+	std::cout << "result1 " << glm::to_string(result) << "\n";
+
+
+	glm::mat4 result2(1.0);
+
+	result2 = glm::rotate(result2, (float)rvec.at<double>(0), glm::vec3(1, 0, 0));
+	result2 = glm::rotate(result2, -(float)rvec.at<double>(1), glm::vec3(0, 1, 0));
+	result2 = glm::rotate(result2, -(float)rvec.at<double>(2), glm::vec3(0, 0, 1));
+	result2 = glm::translate(result2, glm::vec3(tvec.at<double>(0), -tvec.at<double>(1), -tvec.at<double>(2)));
+
+
+	std::cout<<"result2 " << glm::to_string(result2) << "\n";
+
+
+
+
 	return result;
 }
 

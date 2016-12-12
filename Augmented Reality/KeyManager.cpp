@@ -11,7 +11,13 @@ std::unordered_map<char, std::string> KeyManager::keyToOptionsMap={
 	{ GLFW_KEY_7, "lineSegmentsWithCorner" },
 	{ GLFW_KEY_8, "markers" },
 	{ GLFW_KEY_ESCAPE, "escape" },
-	{ GLFW_KEY_P, "poseFinderExample" }
+	{ GLFW_KEY_P, "poseFinderExample" },
+	{ GLFW_KEY_W, "W" },
+	{ GLFW_KEY_A, "A" },
+	{ GLFW_KEY_D, "D" },
+	{ GLFW_KEY_S, "S" },
+	{ GLFW_KEY_E, "E" },
+	{ GLFW_KEY_Q, "Q" }
 };
 std::unordered_map<std::string, bool> KeyManager::options;
 void KeyManager::init(GLFWwindow* window)

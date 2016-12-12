@@ -16,7 +16,7 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = true;
+const bool USE_CAMERA = false;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -72,7 +72,8 @@ int main(int argc, char** argv) {
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	bool isRunning=true;
 	glfwSetTime(0);
-	glm::mat4 cameraMatrix = glm::mat4(1.0f);
+	float x, y, z; z = x = y = 0;
+	std::vector<glm::mat4> cameraMatrix;
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
@@ -126,33 +127,77 @@ int main(int argc, char** argv) {
 			decorator.drawARMarkers(frame, markers);
 		}
 		if (keyManager.isActive("poseFinderExample")) {
+			cameraMatrix.clear();
 			for (auto& marker : detector.getARMarkers()) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
 				for (auto& imagePoint : imagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(0, 255, 255), -1);
 				}
-				cameraMatrix = PoseFinder::findPose(imagePoints, PoseFinder::getExample3DPoints());
+				cameraMatrix.push_back(PoseFinder::findPose(imagePoints, PoseFinder::getExample3DPoints()));
 				for (auto& imagePoint : PoseFinder::projectedPoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(150, 0, 255), -1);
 				}
 			}
+			
 		}
 		else {
-			cameraMatrix = glm::lookAt( //Wylicz macierz widoku
-				glm::vec3(2.0f, 2.0f, 2.0f),
+			cameraMatrix.clear();
+			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(0.0f, 0.0f, 5.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(-1.0f, -1.0f, 1.0f));
+				glm::vec3(0.0f, 1.0f, 0.0f)));
+
+			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(1.0f, 1.0f, 5.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f)));
 		}
 
 		if (keyManager.isActive("escape")) 
 			glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
 
+		if (keyManager.isActive("W")) {
+			y += 15;
+			keyManager.keyPressed(GLFW_KEY_W);
+		}
+
+		if (keyManager.isActive("S")) {
+			y -= 15;
+			keyManager.keyPressed(GLFW_KEY_S);
+		}
+
+		if (keyManager.isActive("A")) {
+			x += 15;
+			keyManager.keyPressed(GLFW_KEY_A);
+		}
+
+		if (keyManager.isActive("D")) {
+			x -= 15;
+			keyManager.keyPressed(GLFW_KEY_D);
+		}
+
+		if (keyManager.isActive("E")) {
+			z += 15;
+			keyManager.keyPressed(GLFW_KEY_E);
+		}
+
+		if (keyManager.isActive("Q")) {
+			z -= 15;
+			keyManager.keyPressed(GLFW_KEY_Q);
+		}
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
 
 		//cv::imshow(WINDOW_NAME, frame);
 		glfwSetTime(0);
+		glm::mat4 camRot = mat4(1.0f);
+		camRot = glm::rotate(camRot, radians(x), glm::vec3(1, 0, 0));
+		camRot = glm::rotate(camRot, radians(y), glm::vec3(0, 1, 0));
+		camRot = glm::rotate(camRot, radians(z), glm::vec3(0, 0, 1));
+		for (auto cameraMat = cameraMatrix.begin(); cameraMat != cameraMatrix.end(); cameraMat++) {
+			*cameraMat = camRot * (*cameraMat);
+		}
 		drawer.drawScene(&frame, cameraMatrix);
 		keyManager.handleEvents();
 	}

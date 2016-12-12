@@ -19,7 +19,7 @@ public:
 	Drawer();
 	~Drawer();
 	void init(int frameWidth, int frameHeight);
-	void drawScene(cv::Mat *frame, glm::mat4 cameraMatrix);
+	void drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix);
 	GLFWwindow* getWindow();
 	
 private:
