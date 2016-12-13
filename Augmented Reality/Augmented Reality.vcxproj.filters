@@ -152,24 +152,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="backgroundFshader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="backgroundVshader.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="fshader.frag">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="vshader.vert">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <Image Include="testTex.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="vshader.vert">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="backgroundVshader.vert">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="backgroundFshader.frag">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="fshader.frag">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

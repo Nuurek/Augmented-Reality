@@ -18,11 +18,20 @@ Drawer::~Drawer()
 	freeOpenGLProgram();
 }
 
+//Procedura obs³ugi b³êdów
+void error_callback(int error, const char* description) {
+	fputs(description, stderr);
+}
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+	
+}
 void Drawer::init(int frameWidth, int frameHeight)
 {
 	GLFWwindow* window; //WskaŸnik na obiekt reprezentuj¹cy okno
 
-	//glfwSetErrorCallback(error_callback); //Zarejestruj procedurê obs³ugi b³êdów
+	glfwSetErrorCallback(error_callback); //Zarejestruj procedurê obs³ugi b³êdów
+	glfwSetWindowSizeCallback(window, window_size_callback);
 
 	if (!glfwInit()) { //Zainicjuj bibliotekê GLFW
 		fprintf(stderr, "Nie mo¿na zainicjowaæ GLFW.\n");
@@ -47,10 +56,6 @@ void Drawer::init(int frameWidth, int frameHeight)
 	}
 	this->window = window;
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
-}
-//Procedura obs³ugi b³êdów
-void error_callback(int error, const char* description) {
-	fputs(description, stderr);
 }
 void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który nale¿y wykonaæ raz, na pocz¹tku programu************
@@ -114,7 +119,7 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	glDeleteBuffers(1, &bufNormals); //Usuniêcie VBO z wektorami normalnymi
 	glDeleteBuffers(1, &bufTexCoords); //Usuniêcie VBO ze wspó³rzêdnymi teksturowania
 
-	tex0 = readTexture("cubeTex.png");
+	tex0 = readTexture("testTex.png");
 	currentFrameTex = initFrameTexture();
 
 }
@@ -136,11 +141,10 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 }
 //Procedura rysuj¹ca zawartoœæ sceny
 void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix) {
-	//************Tutaj umieszczaj kod rysuj¹cy obraz******************l
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-	glm::mat4 P = glm::perspective(glm::radians(50.f), 4.f/3.f, 0.01f, 1000.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(glm::radians(50.f), 4.f/3.f, 0.1f, 100.0f);
 
 	glm::mat4 M = glm::mat4(1.0f);
 
@@ -150,8 +154,6 @@ void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix) {
 
 	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel, currentFrameTex);
 
-
-	//Przerzuæ tylny bufor na przedni
 	glfwSwapBuffers(window);
 
 }

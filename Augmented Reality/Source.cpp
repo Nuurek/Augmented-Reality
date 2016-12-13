@@ -16,7 +16,7 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = false;
+const bool USE_CAMERA = true;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 
 	KeyManager keyManager;
 	keyManager.init(drawer.getWindow());
-
+	PoseFinder::init();
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	bool isRunning=true;
@@ -130,9 +130,15 @@ int main(int argc, char** argv) {
 			cameraMatrix.clear();
 			for (auto& marker : detector.getARMarkers()) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
-				for (auto& imagePoint : imagePoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(0, 255, 255), -1);
+				int i = 0;
+				char* str;
+				for (auto point = imagePoints.begin(); point != imagePoints.end(); point++) {
+					auto color = cv::Scalar(i * 255 / (imagePoints.size()+1), 55, 255 - i * 255 / (imagePoints.size()+1));
+					cv::circle(frame, *point, 5, color, -1);
+					cv::putText(frame, itoa(i, str, 10), *point, cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 2, color, 3, 8);
+					i++;
 				}
+				
 				cameraMatrix.push_back(PoseFinder::findPose(imagePoints, PoseFinder::getExample3DPoints()));
 				for (auto& imagePoint : PoseFinder::projectedPoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(150, 0, 255), -1);
@@ -185,9 +191,7 @@ int main(int argc, char** argv) {
 			z -= 15;
 			keyManager.keyPressed(GLFW_KEY_Q);
 		}
-		if (WRITE_VIDEO) {
-			videoWriter.write(frame);
-		}
+		
 
 		//cv::imshow(WINDOW_NAME, frame);
 		glfwSetTime(0);
@@ -198,6 +202,17 @@ int main(int argc, char** argv) {
 		for (auto cameraMat = cameraMatrix.begin(); cameraMat != cameraMatrix.end(); cameraMat++) {
 			*cameraMat = camRot * (*cameraMat);
 		}
+		for (auto point = PoseFinder::axeis2DPoints.begin(); point != PoseFinder::axeis2DPoints.end(); point += 5) {
+
+			cv::line(frame, *point, *(point+1), cv::Scalar(0, 0, 255), 3);
+			cv::line(frame, *point, *(point + 2), cv::Scalar(0, 255, 0), 3);
+			cv::line(frame, *point, *(point + 3), cv::Scalar(255, 0, 255), 3);
+			cv::line(frame, *point, *(point+4), cv::Scalar(255, 0, 0), 3);
+		}
+		if (WRITE_VIDEO) {
+			videoWriter.write(frame);
+		}
+		PoseFinder::axeis2DPoints.clear();
 		drawer.drawScene(&frame, cameraMatrix);
 		keyManager.handleEvents();
 	}

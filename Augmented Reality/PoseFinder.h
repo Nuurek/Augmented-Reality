@@ -9,10 +9,14 @@ class PoseFinder
 {
 public:
 	static std::vector<cv::Point2f> projectedPoints;
+	static std::vector<cv::Point2f> axeis2DPoints;
 	PoseFinder();
+	static void init();
 	~PoseFinder();
 	static glm::mat4 findPose(std::vector<cv::Point2f> imagePoints, std::vector<cv::Point3f> objectPoints);
 	static std::vector<cv::Point2f> getExample2DPoints();
 	static std::vector<cv::Point3f> getExample3DPoints();
+	static cv::Mat cameraMatrix;
+	static cv::Mat distCoeffs;
 };
 

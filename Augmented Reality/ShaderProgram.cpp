@@ -18,13 +18,15 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 */
 
 #include "shaderprogram.h"
-
+#include <string>
+#include <fstream>
+#include <sstream> 
 //Procedura wczytuje plik do tablicy znaków.
 char* ShaderProgram::readFile(char* fileName) {
 	int filesize;
 	FILE *plik;
 	char* result;
-
+	printf("loading %s\n", fileName);
 	plik=fopen(fileName,"r");
 	fseek(plik,0,SEEK_END);
 	filesize=ftell(plik);
@@ -32,11 +34,34 @@ char* ShaderProgram::readFile(char* fileName) {
 	result=new char[filesize+1];
 	fread(result,1,filesize,plik);
 	result[filesize]=0;
+	printf("size: %d", filesize);
+	printf("result %s\n", result);
 	fclose(plik);
 
 	return result;
 }
+std::string read_shader_file(const char *shader_file)
+{
+	// no feedback is provided for stream errors / exceptions.
 
+	std::ifstream file(shader_file);
+	if (!file) return std::string();
+
+	file.ignore(std::numeric_limits<std::streamsize>::max());
+	auto size = file.gcount();
+
+	if (size > 0x10000) // 64KiB sanity check for shaders:
+		return std::string();
+
+	file.clear();
+	file.seekg(0, std::ios_base::beg);
+
+	std::stringstream sstr;
+	sstr << file.rdbuf();
+	file.close();
+
+	return sstr.str();
+}
 //Metoda wczytuje i kompiluje shader, a następnie zwraca jego uchwyt
 GLuint ShaderProgram::loadShader(GLenum shaderType,char* fileName) {
 	//Wygeneruj uchwyt na shader
@@ -44,6 +69,9 @@ GLuint ShaderProgram::loadShader(GLenum shaderType,char* fileName) {
 	//Wczytaj plik ze źródłem shadera do tablicy znaków
 	const GLchar* shaderSource=readFile(fileName);
 	//Powiąż źródło z uchwytem shadera
+	//std::string shaderStr = read_shader_file(fileName);
+	//const char *c_str = shaderStr.c_str();
+	//shaderSource = c_str;
 	glShaderSource(shader,1,&shaderSource,NULL);
 	//Skompiluj źródło
 	glCompileShader(shader);
