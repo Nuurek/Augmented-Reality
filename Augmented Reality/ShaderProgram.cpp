@@ -27,13 +27,13 @@ char* ShaderProgram::readFile(char* fileName) {
 	FILE *plik;
 	char* result;
 	printf("loading %s\n", fileName);
-	plik=fopen(fileName,"r");
+	plik=fopen(fileName,"rb");
 	fseek(plik,0,SEEK_END);
 	filesize=ftell(plik);
 	fseek(plik,0,SEEK_SET);
 	result=new char[filesize+1];
 	fread(result,1,filesize,plik);
-	result[filesize]=0;
+	result[filesize]='\0';
 	printf("size: %d", filesize);
 	printf("result %s\n", result);
 	fclose(plik);
