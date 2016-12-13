@@ -8,6 +8,7 @@
 #include "ARMarkerDetector.h"
 #include "KeyManager.h"
 #include "FrameDecorator.h"
+#include "PatternRecognition.h"
 
 #define GLM_FORCE_RADIANS
 
@@ -128,57 +129,64 @@ int main(int argc, char** argv) {
 			decorator.drawARMarkers(frame, markers);
 		}
 
-		cameraMatrix.clear();
 
 		if (keyManager.isActive("poseFinderExample")) {
 			auto markers = detector.getARMarkers();
 			auto numberOfMarkers = markers.size();
 			
-			if (!markers.size()) {
-				continue;
-			}
+			if (markers.size()>0) {
+				auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
+				auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
 
-			auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
-			auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
-
-			for (auto& marker : markers) {
-				auto imagePoints = marker.getVectorizedForOpenCV();
-				imagePointsPatterns.push_back(imagePoints);
-			}
-
-			CameraCalibration cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
-			std::cout << cameraCalibration.cameraMatrix << "\n";
-			std::cout << cameraCalibration.distCoeffs << "\n";
-			auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
-			if (focalX > frame.cols * 2.0f) {
-				std::cout << "Camera calibration not found.\n";
-				continue;
-			}
-
-			for (auto& marker : markers) {
-				auto imagePoints = marker.getVectorizedForOpenCV();
-
-				for (auto& imagePoint : imagePoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
+				for (auto& marker : markers) {
+					auto imagePoints = marker.getVectorizedForOpenCV();
+					imagePointsPatterns.push_back(imagePoints);
 				}
-			}
-			
-			for (auto& marker : markers) {
-				auto bottomImagePoints = marker.getVectorizedForOpenCV();
-				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
-				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
-				cameraMatrix.push_back(transformationMatrix.getViewMatrix());
-				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
-				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
-				for (auto& imagePoint : topImagePoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
+
+				CameraCalibration cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
+				std::cout << cameraCalibration.cameraMatrix << "\n";
+				std::cout << cameraCalibration.distCoeffs << "\n";
+				auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
+				if (focalX > frame.cols * 2.0f) {
+					std::cout << "Camera calibration not found.\n";		
 				}
+				else {
+					for (auto& marker : markers) {
+						auto imagePoints = marker.getVectorizedForOpenCV();
+						for (auto& imagePoint : imagePoints) {
+							cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
+						}
+					}
+					cameraMatrix.clear();
+					char* str;
+					for (auto& marker : markers) {
+						auto imagePoints = marker.getVectorizedForOpenCV();
+						int patternId = PatternRecognition::getPatternId(frame, imagePoints);
+						if (patternId < 0) {
+							cv::putText(frame, "Wrong", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250, 150, 0), 2, 8);
+							continue;
+						}
+						cv::putText(frame, itoa(patternId, str, 10), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250,150,0), 2, 8);
+						auto bottomImagePoints = marker.getVectorizedForOpenCV();
+						auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
+						auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
+						cameraMatrix.push_back(transformationMatrix.getViewMatrix());
+						auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
+						auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
+						for (auto& imagePoint : topImagePoints) {
+							cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
+						}
+					}
+				}
+
 			}
 			
 		}
 		else {
+
+			cameraMatrix.clear();
 			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
-				glm::vec3(5.0f*cos(angle), 5.0f*sin(angle), 0.0f),
+				glm::vec3(10.0f*cos(angle), 10.0f*sin(angle), 0.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
 				glm::vec3(0.0f, 1.0f, 0.0f)));
 		}

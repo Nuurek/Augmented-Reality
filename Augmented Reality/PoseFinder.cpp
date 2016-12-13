@@ -37,7 +37,7 @@ CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> obje
 TransformationMatrix PoseFinder::findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration) {
 	TransformationMatrix transformationMatrix;
 
-	cv::solvePnPRansac(objectPoints, imagePoints, cameraCalibration.cameraMatrix,
+	cv::solvePnP(objectPoints, imagePoints, cameraCalibration.cameraMatrix,
 		cameraCalibration.distCoeffs, transformationMatrix.rotationVector, transformationMatrix.translationVector);
 
 	return transformationMatrix;

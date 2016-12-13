@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Model.h"
 #include "opencv2/opencv.hpp"
+#include "GLModel.h"
+#include <vector>
 
 #define GLM_FORCE_RADIANS
 
@@ -21,9 +23,9 @@ public:
 	void init(int frameWidth, int frameHeight);
 	void drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix);
 	GLFWwindow* getWindow();
-	
 private:
-	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM, Models::Model object, GLuint texture);
+	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM, int vertexCount, GLuint texture);
+	void drawBackground(GLuint vao, ShaderProgram * shader, Models::Model object, GLuint texture);
 	void initOpenGLProgram(GLFWwindow * window);
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
@@ -43,5 +45,6 @@ private:
 	const float PI = 3.141592653589793f; 
 	GLFWwindow* window;
 	float aspectRatio = 4.f/3.f;
+	std::vector<GLModel*> glModels;
 };
 

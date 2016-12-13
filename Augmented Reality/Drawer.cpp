@@ -7,6 +7,7 @@
 #include "lodepng.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "OBJloader.h"
 
 Drawer::Drawer()
 {
@@ -72,8 +73,13 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	GLuint bufTexCoords;
 
 	shaderProgram = new ShaderProgram("vshader.vert", NULL, "fshader.frag"); //Wczytaj program cieniuj¹cy
-	backgroundShaderProgram = new ShaderProgram("backgroundVshader.vert", NULL, "backgroundFshader.frag");												   //*****Przygotowanie do rysowania pojedynczego obiektu*******
-		//model																	   //Zbuduj VBO z danymi obiektu do narysowania
+	backgroundShaderProgram = new ShaderProgram("backgroundVshader.vert", NULL, "backgroundFshader.frag");	
+
+	OBJloader cubeLoader;
+	cubeLoader.loadOBJ("data/mustang.obj");
+	glModels.push_back(cubeLoader.getGlModel(shaderProgram, "data/mustang.png"));
+	
+		//model
 	bufVertices = makeBuffer(model.vertices, model.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków
 	bufColors = makeBuffer(model.colors, model.vertexCount, sizeof(float) * 4);//VBO z kolorami wierzcho³ków
 	bufNormals = makeBuffer(model.normals, model.vertexCount, sizeof(float) * 4);//VBO z wektorami normalnymi wierzcho³ków
@@ -150,19 +156,34 @@ void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix) {
 
 	readFrame(frame, currentFrameTex);
 	for(auto cam=cameraMatrix.begin();cam!=cameraMatrix.end();cam++)
-		drawObject(vao, shaderProgram, P, *cam, M, model, tex0);
+		drawObject(glModels[0]->vao, shaderProgram, P, *cam, M, glModels[0]->vertexCount, glModels[0]->texture);
 
-	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel, currentFrameTex);
+	drawBackground(backgroundVAO, backgroundShaderProgram, backgroundModel, currentFrameTex);
 
 	glfwSwapBuffers(window);
 
 }
-void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, Models::Model object, GLuint texture) {
+void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, int vertexCount, GLuint texture) {
 	shader->use();
 
 	glUniformMatrix4fv(shader->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
 	glUniformMatrix4fv(shader->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
 	glUniformMatrix4fv(shader->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	//Uaktywnienie VAO i tym samym uaktywnienie predefiniowanych w tym VAO powi¹zañ slotów atrybutów z tablicami z danymi
+	glBindVertexArray(vao);
+
+	//Narysowanie obiektu
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+
+	//Posprz¹tanie po sobie (niekonieczne w sumie je¿eli korzystamy z VAO dla ka¿dego rysowanego obiektu)
+	glBindVertexArray(0);
+}
+void Drawer::drawBackground(GLuint vao, ShaderProgram *shader, Models::Model object, GLuint texture) {
+	shader->use();
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
