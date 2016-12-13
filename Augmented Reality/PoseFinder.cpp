@@ -69,7 +69,9 @@ glm::mat4 TransformationMatrix::getViewMatrix() {
 	invertYandZMatrix.at<float>(2, 2) = -1.0f;
 	invertYandZMatrix.at<float>(3, 3) = 1.0f;
 
-	viewMatrix *= invertYandZMatrix;
+	viewMatrix = invertYandZMatrix * viewMatrix;
+
+	cv::transpose(viewMatrix, viewMatrix);
 
 	std::cout << "Translation vector: " << translationVector << "\n";
 	std::cout << "Rotation vector: " << rotationVector << "\n";

@@ -235,6 +235,7 @@ int main(int argc, char** argv) {
 			videoWriter.write(frame);
 		}
 
+		cv::waitKey(10);
 		keyManager.handleEvents();
 	}
 
