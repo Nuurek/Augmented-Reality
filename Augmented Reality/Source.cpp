@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
 
 	glfwSetTime(0);
 	float x, y, z; z = x = y = 0;
+	float angle = 0;
 	std::vector<glm::mat4> cameraMatrix;
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
@@ -179,13 +180,8 @@ int main(int argc, char** argv) {
 		}
 		else {
 			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
-				glm::vec3(0.0f, 0.0f, 5.0f),
+				glm::vec3(5.0f*cos(angle), 5.0f*sin(angle), 0.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(0.0f, 1.0f, 0.0f)));
-
-			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
-				glm::vec3(1.0f, 1.0f, 5.0f),
-				glm::vec3(0.0f, 1.0f, 0.0f),
 				glm::vec3(0.0f, 1.0f, 0.0f)));
 		}
 
@@ -222,8 +218,7 @@ int main(int argc, char** argv) {
 			keyManager.keyPressed(GLFW_KEY_Q);
 		}
 		
-
-		//cv::imshow(WINDOW_NAME, frame);
+		angle += glfwGetTime();
 		glfwSetTime(0);
 		glm::mat4 camRot = mat4(1.0f);
 		camRot = glm::rotate(camRot, radians(x), glm::vec3(1, 0, 0));
