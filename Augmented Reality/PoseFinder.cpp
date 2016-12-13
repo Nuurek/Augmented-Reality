@@ -34,8 +34,8 @@ CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> obje
 	return averageCameraCalibration;
 }
 
-TransformationMatrix PoseFinder::findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration) {
-	TransformationMatrix transformationMatrix;
+ViewMatrix PoseFinder::findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration) {
+	ViewMatrix transformationMatrix;
 
 	cv::solvePnPRansac(objectPoints, imagePoints, cameraCalibration.cameraMatrix,
 		cameraCalibration.distCoeffs, transformationMatrix.rotationVector, transformationMatrix.translationVector);
@@ -43,7 +43,7 @@ TransformationMatrix PoseFinder::findTransformaton(VectorOf3DPoints objectPoints
 	return transformationMatrix;
 }
 
-VectorOf2DPoints PoseFinder::getProjectedPoints(CameraCalibration cameraCalibration, TransformationMatrix transformationMatrix, VectorOf3DPoints objectPoints)
+VectorOf2DPoints PoseFinder::getProjectedPoints(CameraCalibration cameraCalibration, ViewMatrix transformationMatrix, VectorOf3DPoints objectPoints)
 {
 	VectorOf2DPoints projectedPoints;
 
@@ -60,56 +60,4 @@ std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints() {
 
 std::vector<cv::Point3f> PoseFinder::getTopOfTheCube3DPoints() {
 	return std::vector<cv::Point3f>{ {-1.0, -1.0, 1.0}, { -1.0, 1.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 1.0, -1.0, 1.0 }};
-}
-
-glm::mat4 TransformationMatrix::getViewMatrix() {
-	cv::Mat viewMatrix = cv::Mat::zeros(4, 4, CV_32F);
-	
-	translationVector.copyTo(viewMatrix(cv::Rect(3, 0, 1, 3)));
-
-	cv::Mat rotationMatrix;
-	cv::Rodrigues(rotationVector, rotationMatrix);
-
-	rotationMatrix.copyTo(viewMatrix(cv::Rect(0, 0, 3, 3)));
-	viewMatrix.at<float>(3, 3) = 1.0f;
-
-	cv::Mat invertYandZMatrix = cv::Mat::zeros(4, 4, CV_32F);
-	invertYandZMatrix.at<float>(0, 0) = 1.0f;
-	invertYandZMatrix.at<float>(1, 1) = -1.0f;
-	invertYandZMatrix.at<float>(2, 2) = -1.0f;
-	invertYandZMatrix.at<float>(3, 3) = 1.0f;
-
-	viewMatrix = invertYandZMatrix * viewMatrix;
-
-	cv::transpose(viewMatrix, viewMatrix);
-
-	glm::mat4 openGLViewMatrix;
-
-	for (size_t row = 0; row < 4; row++) {
-		for (size_t column = 0; column < 4; column++) {
-			openGLViewMatrix[row][column] = viewMatrix.at<float>(row, column);
-		}
-	}
-
-	return openGLViewMatrix;
-}
-
-CameraCalibration::CameraCalibration(float width, float height) {
-	double focalLength = width; // Approximate focal length.
-	cv::Point2d center = cv::Point2d(width / 2.0f, height / 2.0f);
-	cameraMatrix = cv::Mat::zeros(3, 3, CV_32F);
-	cameraMatrix.at<float>(0, 0) = focalLength;
-	cameraMatrix.at<float>(1, 1) = focalLength;
-
-	cameraMatrix.at<float>(0, 2) = center.x;
-	cameraMatrix.at<float>(1, 2) = center.y;
-
-	cameraMatrix.at<float>(2, 2) = 1.0;
-
-	distCoeffs = cv::Mat::zeros(5, 1, CV_32F); // Assuming no lens distortion
-}
-
-CameraCalibration::CameraCalibration() {
-	cameraMatrix = cv::Mat::zeros(cv::Size(3, 3), CV_32F);
-	distCoeffs = cv::Mat::zeros(cv::Size(1, 5), CV_32F);
 }

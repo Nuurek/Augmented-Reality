@@ -17,7 +17,8 @@ std::unordered_map<char, std::string> KeyManager::keyToOptionsMap={
 	{ GLFW_KEY_D, "D" },
 	{ GLFW_KEY_S, "S" },
 	{ GLFW_KEY_E, "E" },
-	{ GLFW_KEY_Q, "Q" }
+	{ GLFW_KEY_Q, "Q" },
+	{ GLFW_KEY_C, "calibration"}
 };
 std::unordered_map<std::string, bool> KeyManager::options;
 void KeyManager::init(GLFWwindow* window)
