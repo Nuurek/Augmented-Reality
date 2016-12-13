@@ -22,12 +22,16 @@ Drawer::~Drawer()
 void error_callback(int error, const char* description) {
 	fputs(description, stderr);
 }
-
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+	
+}
 void Drawer::init(int frameWidth, int frameHeight)
 {
 	GLFWwindow* window; //WskaŸnik na obiekt reprezentuj¹cy okno
 
 	glfwSetErrorCallback(error_callback); //Zarejestruj procedurê obs³ugi b³êdów
+	glfwSetWindowSizeCallback(window, window_size_callback);
 
 	if (!glfwInit()) { //Zainicjuj bibliotekê GLFW
 		fprintf(stderr, "Nie mo¿na zainicjowaæ GLFW.\n");
@@ -53,7 +57,6 @@ void Drawer::init(int frameWidth, int frameHeight)
 	this->window = window;
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
 }
-
 void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który nale¿y wykonaæ raz, na pocz¹tku programu************
 	glClearColor(0, 0, 1, 1); //Czyœæ ekran na czarno	
@@ -137,36 +140,20 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 	return handle;
 }
 //Procedura rysuj¹ca zawartoœæ sceny
-void Drawer::drawScene(cv::Mat *frame, glm::mat4 cameraMatrix) {
-	//************Tutaj umieszczaj kod rysuj¹cy obraz******************l
+void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix) {
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wykonaj czyszczenie bufora kolorów
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-	glm::mat4 P = glm::perspective(33.7f, 4.f/3.f, 0.1f, 100.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(glm::radians(50.f), 4.f/3.f, 0.1f, 100.0f);
 
-	
-	//glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
-	//	glm::vec3(20.0f, 0.0f, 0.0f),
-	//	glm::vec3(0.0f, 0.0f, 1.0f),
-	//	glm::vec3(0.0f, -1.0f, 0.0f));
-	//Wylicz macierz modelu rysowanego obiektu
 	glm::mat4 M = glm::mat4(1.0f);
 
-	//M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
-
-	//tex0 = frame.data;
-
 	readFrame(frame, currentFrameTex);
-	//Narysuj obiekt
-	drawObject(vao, shaderProgram, P, cameraMatrix, M, model, tex0);
-	//model.drawSolid();
-
-	//draw backgroud
+	for(auto cam=cameraMatrix.begin();cam!=cameraMatrix.end();cam++)
+		drawObject(vao, shaderProgram, P, *cam, M, model, tex0);
 
 	drawObject(backgroundVAO, backgroundShaderProgram, glm::mat4(0), glm::mat4(0), glm::mat4(0), backgroundModel, currentFrameTex);
 
-
-	//Przerzuæ tylny bufor na przedni
 	glfwSwapBuffers(window);
 
 }

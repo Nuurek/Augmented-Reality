@@ -19,12 +19,12 @@ namespace Models {
 		unsigned int vertexCount = 6;
 
 		float vertices[] = {
-			1.0f,-1.0f, 1.0f, 1.0f,
 			-1.0f, -1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f,
-			-1.0f, -1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f,
-			-1.0f,1.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 1.0f, 1.0f,
+			-1.0f, 1.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 1.0f, 1.0f,
+			-1.0f, 1.0f, 1.0f, 1.0f,
+			1.0f,1.0f, 1.0f, 1.0f,
 		};
 		float texCoords[] = {
 			0.0f, 1.0f,

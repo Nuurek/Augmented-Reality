@@ -8,7 +8,6 @@
 #include "ARMarkerDetector.h"
 #include "KeyManager.h"
 #include "FrameDecorator.h"
-#include "PoseFinder.h"
 
 #define GLM_FORCE_RADIANS
 
@@ -77,7 +76,8 @@ int main(int argc, char** argv) {
 	poseFinder.setBuffer(&buffer);
 
 	glfwSetTime(0);
-	glm::mat4 cameraMatrix = glm::mat4(1.0f);
+	float x, y, z; z = x = y = 0;
+	std::vector<glm::mat4> cameraMatrix;
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
@@ -172,23 +172,75 @@ int main(int argc, char** argv) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
 			}
+			
 		}
 		else {
-			cameraMatrix = glm::lookAt( //Wylicz macierz widoku
-				glm::vec3(2.0f, 2.0f, 2.0f),
+			cameraMatrix.clear();
+			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(0.0f, 0.0f, 5.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(-1.0f, -1.0f, 1.0f));
+				glm::vec3(0.0f, 1.0f, 0.0f)));
+
+			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(1.0f, 1.0f, 5.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f)));
 		}
 
 		if (keyManager.isActive("escape")) 
 			glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
 
-		if (WRITE_VIDEO) {
-			videoWriter.write(frame);
+		if (keyManager.isActive("W")) {
+			y += 15;
+			keyManager.keyPressed(GLFW_KEY_W);
 		}
+
+		if (keyManager.isActive("S")) {
+			y -= 15;
+			keyManager.keyPressed(GLFW_KEY_S);
+		}
+
+		if (keyManager.isActive("A")) {
+			x += 15;
+			keyManager.keyPressed(GLFW_KEY_A);
+		}
+
+		if (keyManager.isActive("D")) {
+			x -= 15;
+			keyManager.keyPressed(GLFW_KEY_D);
+		}
+
+		if (keyManager.isActive("E")) {
+			z += 15;
+			keyManager.keyPressed(GLFW_KEY_E);
+		}
+
+		if (keyManager.isActive("Q")) {
+			z -= 15;
+			keyManager.keyPressed(GLFW_KEY_Q);
+		}
+		
 
 		//cv::imshow(WINDOW_NAME, frame);
 		glfwSetTime(0);
+		glm::mat4 camRot = mat4(1.0f);
+		camRot = glm::rotate(camRot, radians(x), glm::vec3(1, 0, 0));
+		camRot = glm::rotate(camRot, radians(y), glm::vec3(0, 1, 0));
+		camRot = glm::rotate(camRot, radians(z), glm::vec3(0, 0, 1));
+		for (auto cameraMat = cameraMatrix.begin(); cameraMat != cameraMatrix.end(); cameraMat++) {
+			*cameraMat = camRot * (*cameraMat);
+		}
+		for (auto point = PoseFinder::axeis2DPoints.begin(); point != PoseFinder::axeis2DPoints.end(); point += 5) {
+
+			cv::line(frame, *point, *(point+1), cv::Scalar(0, 0, 255), 3);
+			cv::line(frame, *point, *(point + 2), cv::Scalar(0, 255, 0), 3);
+			cv::line(frame, *point, *(point + 3), cv::Scalar(255, 0, 255), 3);
+			cv::line(frame, *point, *(point+4), cv::Scalar(255, 0, 0), 3);
+		}
+		if (WRITE_VIDEO) {
+			videoWriter.write(frame);
+		}
+		PoseFinder::axeis2DPoints.clear();
 		drawer.drawScene(&frame, cameraMatrix);
 		keyManager.handleEvents();
 	}
