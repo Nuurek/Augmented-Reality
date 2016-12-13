@@ -16,7 +16,7 @@ const unsigned int FRAME_WIDTH = 640;
 const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
-const bool USE_CAMERA = false;
+const bool USE_CAMERA = true;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;

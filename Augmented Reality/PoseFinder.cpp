@@ -22,8 +22,16 @@ CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> obje
 		cameraCalibration.cameraMatrix, cameraCalibration.distCoeffs,
 		rotationVector, translationVector, CV_CALIB_USE_INTRINSIC_GUESS);
 	
-	
-	return cameraCalibration;
+	if (numberOfCalibrations < maxNumberOfCalibrations) {
+		++numberOfCalibrations;
+	}
+
+	float ratio = static_cast<float>(numberOfCalibrations - 1) / static_cast<float>(numberOfCalibrations);
+
+	cv::addWeighted(averageCameraCalibration.cameraMatrix, ratio, cameraCalibration.cameraMatrix, (1.0 - ratio), 0.0, averageCameraCalibration.cameraMatrix, CV_32F);
+	cv::addWeighted(averageCameraCalibration.distCoeffs, ratio, cameraCalibration.distCoeffs, (1.0 - ratio), 0.0, averageCameraCalibration.distCoeffs, CV_32F);
+
+	return averageCameraCalibration;
 }
 
 TransformationMatrix PoseFinder::findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration) {
@@ -89,11 +97,19 @@ glm::mat4 TransformationMatrix::getViewMatrix() {
 CameraCalibration::CameraCalibration(float width, float height) {
 	double focalLength = width; // Approximate focal length.
 	cv::Point2d center = cv::Point2d(width / 2.0f, height / 2.0f);
-	cameraMatrix = (cv::Mat_<double>(3, 3) << focalLength, 0, center.x, 0, focalLength, center.y, 0, 0, 1);
-	distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type); // Assuming no lens distortion
+	cameraMatrix = cv::Mat::zeros(3, 3, CV_32F);
+	cameraMatrix.at<float>(0, 0) = focalLength;
+	cameraMatrix.at<float>(1, 1) = focalLength;
+
+	cameraMatrix.at<float>(0, 2) = center.x;
+	cameraMatrix.at<float>(1, 2) = center.y;
+
+	cameraMatrix.at<float>(2, 2) = 1.0;
+
+	distCoeffs = cv::Mat::zeros(5, 1, CV_32F); // Assuming no lens distortion
 }
 
 CameraCalibration::CameraCalibration() {
-	//cameraMatrix = cv::Mat::zeros(cv::Size(3, 3), CV_32F);
-	//distCoeffs = cv::Mat::zeros(cv::Size(5, 1), CV_32F);
+	cameraMatrix = cv::Mat::zeros(cv::Size(3, 3), CV_32F);
+	distCoeffs = cv::Mat::zeros(cv::Size(1, 5), CV_32F);
 }

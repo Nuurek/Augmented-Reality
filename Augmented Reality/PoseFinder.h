@@ -30,6 +30,9 @@ struct TransformationMatrix {
 class PoseFinder 
 	: public RegionBasedOperator
 {
+	CameraCalibration averageCameraCalibration;
+	const unsigned long maxNumberOfCalibrations = 1000;
+	unsigned long numberOfCalibrations = 0;
 
 public:
 	PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize);
