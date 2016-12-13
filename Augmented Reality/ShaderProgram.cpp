@@ -27,13 +27,13 @@ char* ShaderProgram::readFile(char* fileName) {
 	FILE *plik;
 	char* result;
 	printf("loading %s\n", fileName);
-	plik=fopen(fileName,"r");
+	plik=fopen(fileName,"rb");
 	fseek(plik,0,SEEK_END);
 	filesize=ftell(plik);
 	fseek(plik,0,SEEK_SET);
 	result=new char[filesize+1];
 	fread(result,1,filesize,plik);
-	result[filesize]=0;
+	result[filesize]='\0';
 	printf("size: %d", filesize);
 	printf("result %s\n", result);
 	fclose(plik);
@@ -67,7 +67,7 @@ GLuint ShaderProgram::loadShader(GLenum shaderType,char* fileName) {
 	//Wygeneruj uchwyt na shader
 	GLuint shader=glCreateShader(shaderType);//shaderType to GL_VERTEX_SHADER, GL_GEOMETRY_SHADER lub GL_FRAGMENT_SHADER
 	//Wczytaj plik ze źródłem shadera do tablicy znaków
-	const GLchar* shaderSource=readFile(fileName);
+	const GLchar* shaderSource= readFile(fileName);
 	//Powiąż źródło z uchwytem shadera
 	//std::string shaderStr = read_shader_file(fileName);
 	//const char *c_str = shaderStr.c_str();
