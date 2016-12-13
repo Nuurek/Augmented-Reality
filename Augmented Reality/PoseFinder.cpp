@@ -13,6 +13,7 @@ PoseFinder::PoseFinder(const size_t borderSize, const size_t regionSize, const s
 
 CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatterns) {
 	CameraCalibration cameraCalibration(buffer->getWidth(), buffer->getHeight());
+	//CameraCalibration cameraCalibration;
 
 	cv::Mat rotationVector;
 	cv::Mat translationVector;
@@ -78,20 +79,12 @@ glm::mat4 TransformationMatrix::getViewMatrix() {
 
 	cv::transpose(viewMatrix, viewMatrix);
 
-	std::cout << "Translation vector: " << translationVector << "\n";
-	std::cout << "Rotation vector: " << rotationVector << "\n";
-	std::cout << "Rotatin matrix: " << rotationMatrix << "\n";
-	std::cout << "ViewMatrix: " << viewMatrix << "\n";
-
 	glm::mat4 openGLViewMatrix;
 
 	for (size_t row = 0; row < 4; row++) {
-		std::cout << "[ ";
 		for (size_t column = 0; column < 4; column++) {
 			openGLViewMatrix[row][column] = viewMatrix.at<float>(row, column);
-			std::cout << openGLViewMatrix[row][column] << " ";
 		}
-		std::cout << " ]\n";
 	}
 
 	return openGLViewMatrix;
@@ -102,4 +95,9 @@ CameraCalibration::CameraCalibration(float width, float height) {
 	cv::Point2d center = cv::Point2d(width / 2.0f, height / 2.0f);
 	cameraMatrix = (cv::Mat_<double>(3, 3) << focal_length, 0, center.x, 0, focal_length, center.y, 0, 0, 1);
 	distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type); // Assuming no lens distortion
+}
+
+CameraCalibration::CameraCalibration() {
+	cameraMatrix = cv::Mat::zeros(cv::Size(3, 3), CV_32F);
+	distCoeffs = cv::Mat::zeros(cv::Size(5, 1), CV_32F);
 }

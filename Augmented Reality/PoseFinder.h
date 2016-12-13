@@ -17,6 +17,7 @@ struct CameraCalibration {
 	cv::Mat distCoeffs;
 
 	CameraCalibration(float width, float height);
+	CameraCalibration();
 };
 
 struct TransformationMatrix {
