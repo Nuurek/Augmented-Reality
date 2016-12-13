@@ -8,6 +8,9 @@
 
 #include "RegionBasedOperator.h"
 
+using VectorOf3DPoints = std::vector<cv::Point3f>;
+using VectorOf2DPoints = std::vector<cv::Point2f>;
+
 struct CameraCalibration {
 	cv::Mat cameraMatrix;
 	cv::Mat distCoeffs;
@@ -22,14 +25,10 @@ class PoseFinder
 	: public RegionBasedOperator
 {
 public:
-	using VectorOf3DPoints = std::vector<cv::Point3f>;
-	using VectorOf2DPoints = std::vector<cv::Point2f>;
-
-
-	static std::vector<cv::Point2f> projectedPoints;
 	PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize);
-	VectorOf2DPoints findPose(CameraCalibration cameraCalibration, VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints);
 	CameraCalibration calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters);
+	TransformationMatrix findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration);
+	VectorOf2DPoints getProjectedPoints(CameraCalibration cameraCalibration, TransformationMatrix transformationMatrix, VectorOf3DPoints objectPoints);
 	static std::vector<cv::Point3f> getBottomOfTheCube3DPoints();
 	static std::vector<cv::Point3f> getTopOfTheCube3DPoints();
 };

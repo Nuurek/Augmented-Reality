@@ -87,11 +87,7 @@ int main(int argc, char** argv) {
 		
 		buffer.setFrame(frame);
 
-		auto start = std::chrono::high_resolution_clock::now();
 		detector.findARMarkers();
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-		std::cout << duration << "us\n";
 
 		if (keyManager.isActive("regions")) {
 			decorator.drawRegionLines(frame);
@@ -133,23 +129,45 @@ int main(int argc, char** argv) {
 		if (keyManager.isActive("poseFinderExample")) {
 			auto markers = detector.getARMarkers();
 			auto numberOfMarkers = markers.size();
+			
+			if (!markers.size()) {
+				continue;
+			}
+
 			auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
 			auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
 
 			for (auto& marker : markers) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
 				imagePointsPatterns.push_back(imagePoints);
+			}
+
+			CameraCalibration cameraCalibration;
+			cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
+			std::cout << cameraCalibration.cameraMatrix << "\n";
+			std::cout << cameraCalibration.distCoeffs << "\n";
+			auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
+			//cameraCalibration.cameraMatrix = (cv::Mat_<double>(3, 3) << frame.cols, 0, frame.cols / 2.0, 0, frame.cols, frame.rows / 2.0, 0, 0, 1);
+			//cameraCalibration.distCoeffs = cv::Mat::zeros(cv::Size(5, 1), CV_32F);
+			if (focalX > frame.cols * 2.0f) {
+				std::cout << "Not found.\n";
+				continue;
+			}
+
+			for (auto& marker : markers) {
+				auto imagePoints = marker.getVectorizedForOpenCV();
 
 				for (auto& imagePoint : imagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
 				}
 			}
-
-			auto cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
-
+			
 			for (auto& marker : markers) {
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
-				auto topImagePoints = poseFinder.findPose(cameraCalibration, PoseFinder::getBottomOfTheCube3DPoints(), bottomImagePoints);
+				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
+				auto transformationMatrx = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
+				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
+				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrx, topObjectPoints);
 				for (auto& imagePoint : topImagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}

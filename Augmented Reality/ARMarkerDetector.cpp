@@ -23,11 +23,7 @@ void ARMarkerDetector::findARMarkers() {
 	size_t maxWidth = width - BORDER_SIZE - 1;
 	size_t maxHeight = height - BORDER_SIZE - 1;
 
-	long long findingEdgelsTime = 0, findingLineSegments = 0;
-
 	clearStructures();
-
-	lineSegmentDetector.counter = 0;
 
 	for (size_t regionTop = BORDER_SIZE; regionTop < maxHeight; regionTop += REGION_SIZE) {
 		for (size_t regionLeft = BORDER_SIZE; regionLeft < maxWidth; regionLeft += REGION_SIZE) {
@@ -42,7 +38,6 @@ void ARMarkerDetector::findARMarkers() {
 
 			auto end = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			findingEdgelsTime += duration;
 			//
 
 			//
@@ -56,7 +51,6 @@ void ARMarkerDetector::findARMarkers() {
 
 			end = std::chrono::high_resolution_clock::now();
 			duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			findingLineSegments += duration;
 			//
 
 			//
@@ -73,25 +67,11 @@ void ARMarkerDetector::findARMarkers() {
 		}
 	}
 
-	std::cout << "Finding edgels: " << findingEdgelsTime << "us.\n";
-	std::cout << "Edgels: " << edgels.size() << "\n";
-	std::cout << "Finding line segments: " << findingLineSegments << "us.\n";
-	std::cout << "Counter: " << lineSegmentDetector.counter << "\n";
-
-	std::cout << "Line segments in regions: " << lineSegments.size() << "\n";
-	std::cout << "Merged line segments in regions: " << mergedLineSegments.size() << "\n";
-
 	mergedLineSegments = lineSegmentMerger.mergeLineSegments(mergedLineSegments);
-
-	std::cout << "Merged line segments: " << mergedLineSegments.size() << "\n";
 
 	extendedLineSegments = lineSegmentExtender.extendLineSegments(mergedLineSegments);
 
-	std::cout << "Extended line segments: " << extendedLineSegments.size() << "\n";
-
 	lineSegmentsWithCorner = cornersFinder.findLinesWithCorners(extendedLineSegments);
-
-	std::cout << "Line segments with corner: " << lineSegmentsWithCorner.size() << "\n";
 
 	arMarkers = markerFinder.findMarkers(lineSegmentsWithCorner);
 }

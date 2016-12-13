@@ -2,6 +2,7 @@
 
 uniform sampler2D textureMap1;
 
+
 in vec2 iTexCoord0;
 out vec4 pixelColor;
 
