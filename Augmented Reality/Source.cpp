@@ -150,8 +150,6 @@ int main(int argc, char** argv) {
 			std::cout << cameraCalibration.cameraMatrix << "\n";
 			std::cout << cameraCalibration.distCoeffs << "\n";
 			auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
-			//cameraCalibration.cameraMatrix = (cv::Mat_<double>(3, 3) << frame.cols, 0, frame.cols / 2.0, 0, frame.cols, frame.rows / 2.0, 0, 0, 1);
-			//cameraCalibration.distCoeffs = cv::Mat::zeros(cv::Size(5, 1), CV_32F);
 			if (focalX > frame.cols * 2.0f) {
 				std::cout << "Camera calibration not found.\n";
 				continue;

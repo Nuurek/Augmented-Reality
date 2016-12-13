@@ -30,6 +30,7 @@ struct TransformationMatrix {
 class PoseFinder 
 	: public RegionBasedOperator
 {
+
 public:
 	PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize);
 	CameraCalibration calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters);
