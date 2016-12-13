@@ -1,10 +1,11 @@
 #pragma once
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "opencv2/opencv.hpp"
 #include <vector>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-//na bazie https://github.com/daviddoria/Examples/blob/master/c%2B%2B/OpenCV/SolvePNP/SolvePNP.cxx
 
 #include "RegionBasedOperator.h"
 
@@ -17,8 +18,10 @@ struct CameraCalibration {
 };
 
 struct TransformationMatrix {
-	cv::Mat rotationMatrix;
-	cv::Mat translationMatrix;
+	cv::Mat rotationVector;
+	cv::Mat translationVector;
+
+	glm::mat4 getViewMatrix();
 };
 
 class PoseFinder 
@@ -28,7 +31,7 @@ public:
 	PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize);
 	CameraCalibration calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters);
 	TransformationMatrix findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration);
-	VectorOf2DPoints getProjectedPoints(CameraCalibration cameraCalibration, TransformationMatrix transformationMatrix, VectorOf3DPoints objectPoints);
+	VectorOf2DPoints getProjectedPoints(CameraCalibration cameraCalibration, TransformationMatrix transformationVector, VectorOf3DPoints objectPoints);
 	static std::vector<cv::Point3f> getBottomOfTheCube3DPoints();
 	static std::vector<cv::Point3f> getTopOfTheCube3DPoints();
 };

@@ -126,6 +126,9 @@ int main(int argc, char** argv) {
 			auto markers = detector.getARMarkers();
 			decorator.drawARMarkers(frame, markers);
 		}
+
+		cameraMatrix.clear();
+
 		if (keyManager.isActive("poseFinderExample")) {
 			auto markers = detector.getARMarkers();
 			auto numberOfMarkers = markers.size();
@@ -150,7 +153,7 @@ int main(int argc, char** argv) {
 			//cameraCalibration.cameraMatrix = (cv::Mat_<double>(3, 3) << frame.cols, 0, frame.cols / 2.0, 0, frame.cols, frame.rows / 2.0, 0, 0, 1);
 			//cameraCalibration.distCoeffs = cv::Mat::zeros(cv::Size(5, 1), CV_32F);
 			if (focalX > frame.cols * 2.0f) {
-				std::cout << "Not found.\n";
+				std::cout << "Camera calibration not found.\n";
 				continue;
 			}
 
@@ -165,9 +168,10 @@ int main(int argc, char** argv) {
 			for (auto& marker : markers) {
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
 				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
-				auto transformationMatrx = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
+				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
+				cameraMatrix.push_back(transformationMatrix.getViewMatrix());
 				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
-				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrx, topObjectPoints);
+				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
 				for (auto& imagePoint : topImagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
@@ -175,7 +179,6 @@ int main(int argc, char** argv) {
 			
 		}
 		else {
-			cameraMatrix.clear();
 			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
 				glm::vec3(0.0f, 0.0f, 5.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
@@ -230,18 +233,13 @@ int main(int argc, char** argv) {
 		for (auto cameraMat = cameraMatrix.begin(); cameraMat != cameraMatrix.end(); cameraMat++) {
 			*cameraMat = camRot * (*cameraMat);
 		}
-		for (auto point = PoseFinder::axeis2DPoints.begin(); point != PoseFinder::axeis2DPoints.end(); point += 5) {
+		
+		drawer.drawScene(&frame, cameraMatrix);
 
-			cv::line(frame, *point, *(point+1), cv::Scalar(0, 0, 255), 3);
-			cv::line(frame, *point, *(point + 2), cv::Scalar(0, 255, 0), 3);
-			cv::line(frame, *point, *(point + 3), cv::Scalar(255, 0, 255), 3);
-			cv::line(frame, *point, *(point+4), cv::Scalar(255, 0, 0), 3);
-		}
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
 		}
-		PoseFinder::axeis2DPoints.clear();
-		drawer.drawScene(&frame, cameraMatrix);
+
 		keyManager.handleEvents();
 	}
 

@@ -28,7 +28,7 @@ void window_size_callback(GLFWwindow* window, int width, int height)
 }
 void Drawer::init(int frameWidth, int frameHeight)
 {
-	GLFWwindow* window; //WskaŸnik na obiekt reprezentuj¹cy okno
+	GLFWwindow* window = nullptr; //WskaŸnik na obiekt reprezentuj¹cy okno
 
 	glfwSetErrorCallback(error_callback); //Zarejestruj procedurê obs³ugi b³êdów
 	glfwSetWindowSizeCallback(window, window_size_callback);
