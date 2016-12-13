@@ -31,6 +31,9 @@ const size_t BORDER_SIZE = 2;
 const size_t REGION_SIZE = 40;
 const size_t STEP_SIZE = 5;
 
+enum class MODE { IDLE, CALIBRATING, MARKER_FINDING, AUGMENTED_REALITY };
+MODE mode = MODE::IDLE;
+
 int exitWithError(const char * errorMessage) {
 	std::cerr << errorMessage << "\n";
 	return EXIT_FAILURE;
@@ -52,9 +55,6 @@ int main(int argc, char** argv) {
 		cv::resize(exampleImage, exampleImage, cv::Size(FRAME_WIDTH, FRAME_HEIGHT));
 	}
 
-	
-
-	//cv::namedWindow(WINDOW_NAME);
 	Drawer drawer;
 	drawer.init(FRAME_WIDTH,FRAME_HEIGHT);
 
@@ -73,12 +73,14 @@ int main(int argc, char** argv) {
 	Buffer buffer;
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
-	KeyManager keyManager;
-	keyManager.init(drawer.getWindow());
+	KeyManager keyManager(drawer.getWindow());
 
 	detector.setBuffer(&buffer);
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	bool isRunning=true;
+
+	CameraCalibration cameraCalibration;
+	cameraCalibration = cameraCalibrator.loadFromFile("camera-calibration.xml");
 
 	PoseFinder poseFinder(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	poseFinder.setBuffer(&buffer);
@@ -94,7 +96,19 @@ int main(int argc, char** argv) {
 			frame = exampleImage.clone();
 		}
 
-		if (CALIBRATION) {
+		cameraMatrix.clear();
+
+		if (mode != MODE::CALIBRATING) {
+			if (keyManager.isActive("calibrating")) {
+				mode = MODE::CALIBRATING;
+			} else if (keyManager.isActive("markerFinding")) {
+				mode = MODE::MARKER_FINDING;
+			} else if (keyManager.isActive("augmentedReality")) {
+				mode = MODE::AUGMENTED_REALITY;
+			}
+		}
+
+		if (mode == MODE::CALIBRATING) {
 			if (!cameraCalibrator.isSessionRunning()) {
 				cameraCalibrator.setFrameSize(frame.rows, frame.cols);
 				cameraCalibrator.startSession();
@@ -114,14 +128,21 @@ int main(int argc, char** argv) {
 
 					cameraCalibrator.saveToFile(cameraCalibration, "camera-calibration.xml");
 
-					return EXIT_SUCCESS;
+					mode = MODE::IDLE;
 				}
 			}
-		} else {
+
+			if (!keyManager.isActive("calibrating")) {
+				mode = MODE::IDLE;
+			}
+		}
+
+		if (mode == MODE::MARKER_FINDING || mode == MODE::AUGMENTED_REALITY) {
 			buffer.setFrame(frame);
-
 			detector.findARMarkers();
+		}
 
+		if (mode == MODE::MARKER_FINDING) {
 			if (keyManager.isActive("regions")) {
 				decorator.drawRegionLines(frame);
 			}
@@ -160,58 +181,54 @@ int main(int argc, char** argv) {
 				decorator.drawARMarkers(frame, markers);
 			}
 
-			cameraMatrix.clear();
+			if (!keyManager.isActive("markerFinding")) {
+				mode = MODE::IDLE;
+			}
+		}
 
-			if (keyManager.isActive("poseFinderExample")) {
-				auto markers = detector.getARMarkers();
-				auto numberOfMarkers = markers.size();
+		if (mode == MODE::AUGMENTED_REALITY) {
 
-				if (!markers.size()) {
-					continue;
+			auto markers = detector.getARMarkers();
+			auto numberOfMarkers = markers.size();
+
+			if (!markers.size()) {
+				continue;
+			}
+
+			auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
+			auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
+
+			for (auto& marker : markers) {
+				auto imagePoints = marker.getVectorizedForOpenCV();
+				imagePointsPatterns.push_back(imagePoints);
+			}
+
+			std::cout << cameraCalibration.cameraMatrix << "\n";
+			std::cout << cameraCalibration.distCoeffs << "\n";
+			auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
+			if (focalX > frame.cols * 2.0f) {
+				std::cout << "Camera calibration not found.\n";
+				continue;
+			}
+
+			for (auto& marker : markers) {
+				auto imagePoints = marker.getVectorizedForOpenCV();
+
+				for (auto& imagePoint : imagePoints) {
+					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
 				}
+			}
 
-				auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
-				auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
-
-				for (auto& marker : markers) {
-					auto imagePoints = marker.getVectorizedForOpenCV();
-					imagePointsPatterns.push_back(imagePoints);
+			for (auto& marker : markers) {
+				auto bottomImagePoints = marker.getVectorizedForOpenCV();
+				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
+				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
+				cameraMatrix.push_back(transformationMatrix.getViewMatrix());
+				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
+				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
+				for (auto& imagePoint : topImagePoints) {
+					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
-
-				CameraCalibration cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
-				std::cout << cameraCalibration.cameraMatrix << "\n";
-				std::cout << cameraCalibration.distCoeffs << "\n";
-				auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
-				if (focalX > frame.cols * 2.0f) {
-					std::cout << "Camera calibration not found.\n";
-					continue;
-				}
-
-				for (auto& marker : markers) {
-					auto imagePoints = marker.getVectorizedForOpenCV();
-
-					for (auto& imagePoint : imagePoints) {
-						cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
-					}
-				}
-
-				for (auto& marker : markers) {
-					auto bottomImagePoints = marker.getVectorizedForOpenCV();
-					auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
-					auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
-					cameraMatrix.push_back(transformationMatrix.getViewMatrix());
-					auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
-					auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
-					for (auto& imagePoint : topImagePoints) {
-						cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
-					}
-				}
-
-			} else {
-				cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
-					glm::vec3(5.0f*cos(angle), 5.0f*sin(angle), 0.0f),
-					glm::vec3(0.0f, 0.0f, 0.0f),
-					glm::vec3(0.0f, 1.0f, 0.0f)));
 			}
 
 			if (keyManager.isActive("escape"))
@@ -256,12 +273,20 @@ int main(int argc, char** argv) {
 			for (auto cameraMat = cameraMatrix.begin(); cameraMat != cameraMatrix.end(); cameraMat++) {
 				*cameraMat = camRot * (*cameraMat);
 			}
+
+			if (!keyManager.isActive("augmentedReality")) {
+				mode = MODE::IDLE;
+			}
 		}
-		
+
 		drawer.drawScene(&frame, cameraMatrix);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
+		}
+
+		if (keyManager.isActive("escape")) {
+			glfwSetWindowShouldClose(drawer.getWindow(), true);
 		}
 
 		cv::waitKey(10);

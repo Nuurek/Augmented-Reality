@@ -1,7 +1,7 @@
 #include "KeyManager.h"
 #include <iostream>
 
-std::unordered_map<char, std::string> KeyManager::keyToOptionsMap={
+std::unordered_map<char, std::string> KeyManager::keyToOptionsMap {
 	{ GLFW_KEY_1, "regions"},
 	{ GLFW_KEY_2, "subRegions" },
 	{ GLFW_KEY_3, "edgels" },
@@ -18,13 +18,18 @@ std::unordered_map<char, std::string> KeyManager::keyToOptionsMap={
 	{ GLFW_KEY_S, "S" },
 	{ GLFW_KEY_E, "E" },
 	{ GLFW_KEY_Q, "Q" },
-	{ GLFW_KEY_C, "calibration"}
+	{ GLFW_KEY_C, "calibrating"},
+	{ GLFW_KEY_V, "markerFinding"},
+	{ GLFW_KEY_B, "augmentedReality"},
 };
-std::unordered_map<std::string, bool> KeyManager::options;
-void KeyManager::init(GLFWwindow* window)
-{
-	glfwSetKeyCallback(window, KeyManager::key_callback);
+
+std::unordered_map<std::string, bool> KeyManager::options = {};
+
+KeyManager::KeyManager(GLFWwindow * window) 
+	: window(window) {
+	glfwSetKeyCallback(window, keyCallback);
 }
+
 void KeyManager::keyPressed(char keyCode) {
 	std::string option = keyToOptionsMap[keyCode];
 	if (option == "") {
@@ -37,13 +42,12 @@ void KeyManager::keyPressed(char keyCode) {
 bool KeyManager::isActive(std::string option) {
 	return options[option];
 }
-void KeyManager::key_callback(GLFWwindow* window, int key,
+
+void KeyManager::keyCallback(GLFWwindow* window, int key,
 	int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		keyPressed(key);
 	}
-
-
 }
 
 void KeyManager::handleEvents() {
