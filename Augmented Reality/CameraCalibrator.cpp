@@ -67,6 +67,25 @@ CameraCalibration CameraCalibrator::getCameraCalibration() {
 	return cameraCalibration;
 }
 
+void CameraCalibrator::saveToFile(CameraCalibration cameraCalibration, std::string filename) {
+	cv::FileStorage fileStorage(filename, cv::FileStorage::WRITE);
+
+	fileStorage << "cameraMatrix" << cameraCalibration.cameraMatrix;
+	fileStorage << "distCoeffs" << cameraCalibration.distCoeffs;
+
+	fileStorage.release();
+}
+
+CameraCalibration CameraCalibrator::loadFromFile(std::string filename) {
+	cv::FileStorage fileStorage(filename, cv::FileStorage::READ);
+
+	CameraCalibration cameraCalibration;
+	fileStorage["cameraMatrix"] >> cameraCalibration.cameraMatrix;
+	fileStorage["disoCoeffs"] >> cameraCalibration.distCoeffs;
+
+	return cameraCalibration;
+}
+
 double CameraCalibrator::calibrateCamera() {
 	std::vector<std::vector<cv::Point3f>> objectPointsPattern{ imagePointsPatterns.size(), getCorners3DPoints(SQUARE_SIZE) };
 
@@ -80,7 +99,7 @@ double CameraCalibrator::calibrateCamera() {
 }
 
 bool CameraCalibrator::findChessPattern(const cv::Mat frame, std::vector<cv::Point2f>& pointsBuffer) {
-	bool found = cv::findChessboardCorners(frame, CHESSBOARD_SIZE, pointsBuffer);
+	bool found = cv::findChessboardCorners(frame, CHESSBOARD_SIZE, pointsBuffer, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE);
 	
 	if (found) {
 		improveChessPattern(frame, pointsBuffer);

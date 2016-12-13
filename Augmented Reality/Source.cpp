@@ -24,7 +24,7 @@ const bool WRITE_VIDEO = true;
 const char* WRITE_FILENAME = "capture.mpeg";
 
 const bool CALIBRATION = true;
-const size_t FRAMES_PER_CALIBRATION = 5;
+const size_t FRAMES_PER_CALIBRATION = 30;
 const float CALIBRATION_DELAY = 1.0f;
 
 const size_t BORDER_SIZE = 2;
@@ -111,6 +111,8 @@ int main(int argc, char** argv) {
 					std::cout << "Calibration finished\n";
 					std::cout << "Camera matrix: " << cameraCalibration.cameraMatrix << "\n";
 					std::cout << "Distance coefficients: " << cameraCalibration.distCoeffs << "\n";
+
+					cameraCalibrator.saveToFile(cameraCalibration, "camera-calibration.xml");
 
 					return EXIT_SUCCESS;
 				}

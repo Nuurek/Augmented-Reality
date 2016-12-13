@@ -7,7 +7,7 @@
 #include "CameraCalibration.h"
 #include "ViewMatrix.h"
 
-const cv::Size CHESSBOARD_SIZE{ 4, 4 };
+const cv::Size CHESSBOARD_SIZE{ 9, 6 };
 const float SQUARE_SIZE = 1.0;
 
 using Frames = std::vector<cv::Mat>;
@@ -31,6 +31,8 @@ public:
 	bool addFrame(cv::Mat& frame);
 	bool isSessionFinished() const;
 	CameraCalibration getCameraCalibration();
+	static void saveToFile(CameraCalibration cameraCalibration, std::string filename);
+	static CameraCalibration loadFromFile(std::string filename);
 
 private:
 	CalibrationState state{ CalibrationState::IDLE };
