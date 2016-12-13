@@ -11,15 +11,20 @@ PoseFinder::PoseFinder(const size_t borderSize, const size_t regionSize, const s
 }
 
 
-CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters) {
-	CameraCalibration cameraCalibration;
+CameraCalibration PoseFinder::calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatterns) {
+	CameraCalibration cameraCalibration(buffer->getWidth(), buffer->getHeight());
 
 	cv::Mat rotationVector;
 	cv::Mat translationVector;
 
-	cv::calibrateCamera(objectPointsPatterns, imagePointsPatters, cv::Size(buffer->getWidth(), buffer->getHeight()),
-		cameraCalibration.cameraMatrix, cameraCalibration.distCoeffs,
-		rotationVector, translationVector);
+	try {
+		cv::calibrateCamera(objectPointsPatterns, imagePointsPatterns, cv::Size(buffer->getWidth(), buffer->getHeight()),
+			cameraCalibration.cameraMatrix, cameraCalibration.distCoeffs,
+			rotationVector, translationVector, CV_CALIB_USE_INTRINSIC_GUESS);
+	} catch (cv::Exception& e) {
+		std::cerr << e.msg << "\n";
+	}
+	
 
 	return cameraCalibration;
 }
@@ -45,11 +50,11 @@ VectorOf2DPoints PoseFinder::getProjectedPoints(CameraCalibration cameraCalibrat
 
 
 std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints() {
-	return std::vector<cv::Point3f>{ {0.0, 0.0, 0.0}, { 1.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0 }, { 0.0, 1.0, 0.0 }};
+	return std::vector<cv::Point3f>{ {1.0, 1.0, 1.0}, { 1.0, -1.0, 1.0 }, { -1.0, -1.0, 1.0 }, { -1.0, 1.0, 1.0 }};
 }
 
 std::vector<cv::Point3f> PoseFinder::getTopOfTheCube3DPoints() {
-	return std::vector<cv::Point3f>{ { 0.0, 0.0, -1.0 }, { 1.0, 0.0, -1.0 }, { 1.0, 1.0, -1.0 }, { 0.0, 1.0, -1.0 }};
+	return std::vector<cv::Point3f>{ {1.0, 1.0, -1.0}, { 1.0, -1.0, -1.0 }, { -1.0, -1.0, -1.0 }, { -1.0, 1.0, -1.0 }};
 }
 
 glm::mat4 TransformationMatrix::getViewMatrix() {
@@ -90,4 +95,11 @@ glm::mat4 TransformationMatrix::getViewMatrix() {
 	}
 
 	return openGLViewMatrix;
+}
+
+CameraCalibration::CameraCalibration(float width, float height) {
+	double focal_length = width; // Approximate focal length.
+	cv::Point2d center = cv::Point2d(width / 2.0f, height / 2.0f);
+	cameraMatrix = (cv::Mat_<double>(3, 3) << focal_length, 0, center.x, 0, focal_length, center.y, 0, 0, 1);
+	distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type); // Assuming no lens distortion
 }

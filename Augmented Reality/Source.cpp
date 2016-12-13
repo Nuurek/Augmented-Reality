@@ -145,8 +145,7 @@ int main(int argc, char** argv) {
 				imagePointsPatterns.push_back(imagePoints);
 			}
 
-			CameraCalibration cameraCalibration;
-			cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
+			CameraCalibration cameraCalibration = poseFinder.calibrateCamera(objectsPointsPatterns, imagePointsPatterns);
 			std::cout << cameraCalibration.cameraMatrix << "\n";
 			std::cout << cameraCalibration.distCoeffs << "\n";
 			auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);

@@ -15,6 +15,8 @@ using VectorOf2DPoints = std::vector<cv::Point2f>;
 struct CameraCalibration {
 	cv::Mat cameraMatrix;
 	cv::Mat distCoeffs;
+
+	CameraCalibration(float width, float height);
 };
 
 struct TransformationMatrix {
