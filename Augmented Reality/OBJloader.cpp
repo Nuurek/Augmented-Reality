@@ -24,6 +24,7 @@ bool OBJloader::loadOBJ(const char * path)
 		else if (strcmp(lineHeader, "vt") == 0) {
 			glm::vec2 uv;
 			fscanf(file, "%f %f\n", &uv.x, &uv.y);
+			uv.y = 1.f - uv.y;
 			temp_uvs.push_back(uv);
 		}
 		else if (strcmp(lineHeader, "vn") == 0) {
@@ -53,13 +54,13 @@ bool OBJloader::loadOBJ(const char * path)
 	for (unsigned int i = 0; i < vertexIndices.size(); i++) {
 		unsigned int vertexIndex = vertexIndices[i];
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
-		out_vertices.push_back(glm::vec4(vertex,1));
+		out_vertices.push_back(vertex);
 	}
 
 	for (unsigned int i = 0; i < normalIndices.size(); i++) {
 		unsigned int normalIndex = normalIndices[i];
 		glm::vec3 normal = temp_normals[normalIndex - 1];
-		out_normals.push_back(glm::vec4(normal,1));
+		out_normals.push_back(normal);
 	}
 
 	for (unsigned int i = 0; i < uvIndices.size(); i++) {
@@ -86,8 +87,8 @@ GLModel* OBJloader::getGlModel(ShaderProgram* shaderProgram, char* textureName)
 
 	glBindVertexArray(VAO); //Uaktywnij nowo utworzony VAO
 
-	assignVBOtoAttribute(shaderProgram, "vertex", bufVertices, 4);
-	assignVBOtoAttribute(shaderProgram, "normal", bufNormals, 4); 
+	assignVBOtoAttribute(shaderProgram, "vertex", bufVertices, 3);
+	assignVBOtoAttribute(shaderProgram, "normal", bufNormals, 3); 
 	assignVBOtoAttribute(shaderProgram, "texCoord0", bufTexCoords, 2);
 
 	glBindVertexArray(0);

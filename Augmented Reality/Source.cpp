@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
 	float x, y, z; z = x = y = 0;
 	float angle = 0;
 	std::vector<glm::mat4> cameraMatrix;
+	std::vector<int> objectId;
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
@@ -158,14 +159,16 @@ int main(int argc, char** argv) {
 						}
 					}
 					cameraMatrix.clear();
+					objectId.clear();
 					char* str;
 					for (auto& marker : markers) {
 						auto imagePoints = marker.getVectorizedForOpenCV();
 						int patternId = PatternRecognition::getPatternId(frame, imagePoints);
 						if (patternId < 0) {
-							cv::putText(frame, "Wrong", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250, 150, 0), 2, 8);
+							cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
 							continue;
 						}
+						objectId.push_back(patternId);
 						cv::putText(frame, itoa(patternId, str, 10), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250,150,0), 2, 8);
 						auto bottomImagePoints = marker.getVectorizedForOpenCV();
 						auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
@@ -185,10 +188,12 @@ int main(int argc, char** argv) {
 		else {
 
 			cameraMatrix.clear();
+			objectId.clear();
 			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
 				glm::vec3(10.0f*cos(angle), 10.0f*sin(angle), 0.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
 				glm::vec3(0.0f, 1.0f, 0.0f)));
+			objectId.push_back(0);
 		}
 
 		if (keyManager.isActive("escape")) 
@@ -234,7 +239,7 @@ int main(int argc, char** argv) {
 			*cameraMat = camRot * (*cameraMat);
 		}
 		
-		drawer.drawScene(&frame, cameraMatrix);
+		drawer.drawScene(&frame, cameraMatrix, objectId);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);

@@ -21,7 +21,7 @@ public:
 	Drawer();
 	~Drawer();
 	void init(int frameWidth, int frameHeight);
-	void drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix);
+	void drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix, std::vector<int> objectId);
 	GLFWwindow* getWindow();
 private:
 	void drawObject(GLuint vao, ShaderProgram * shaderProgram, mat4 mP, mat4 mV, mat4 mM, int vertexCount, GLuint texture);
@@ -29,7 +29,6 @@ private:
 	void initOpenGLProgram(GLFWwindow * window);
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
-	GLuint readTexture(char* filename);
 	GLuint initFrameTexture();
 	void readFrame(cv::Mat *frame, GLuint tex);
 	void freeOpenGLProgram();
