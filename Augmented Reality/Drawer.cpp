@@ -141,7 +141,7 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 	return handle;
 }
 //Procedura rysuj¹ca zawartoœæ sceny
-void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix, std::vector<int> objectId) {
+void Drawer::drawScene(cv::Mat& frame, std::vector<glm::mat4> cameraMatrix, std::vector<int> objectId) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -210,10 +210,10 @@ GLuint Drawer::initFrameTexture() {
 
 	return tex;
 }
-void Drawer::readFrame(cv::Mat *frame, GLuint tex) {
+void Drawer::readFrame(cv::Mat& frame, GLuint tex) {
 	glActiveTexture(GL_TEXTURE0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame->cols, frame->rows, 0,
-	GL_BGR, GL_UNSIGNED_BYTE, frame->ptr());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame.cols, frame.rows, 0,
+	GL_BGR, GL_UNSIGNED_BYTE, frame.ptr());
 }
 void Drawer::freeOpenGLProgram() {
 	delete shaderProgram; //Usuniêcie programu cieniuj¹cego

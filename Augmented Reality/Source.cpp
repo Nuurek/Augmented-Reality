@@ -190,7 +190,6 @@ int main(int argc, char** argv) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
 
 				if (keyManager.isActive("cornersDebug")) {
-					std::cout << "Debug corners\n";
 					for (auto& imagePoint : imagePoints) {
 						cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
 					}
@@ -198,20 +197,24 @@ int main(int argc, char** argv) {
 
 				unsigned int patternId = PatternRecognition::getPatternId(frame, imagePoints);
 				if (patternId == INT_MAX) {
-					cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
+					if (keyManager.isActive("cornersDebug")) {
+						cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
+					}
 					continue;
 				}
 				int orientation = patternId % 10;
 				objectIds.push_back(patternId / 10);
-				cv::putText(frame, std::to_string(patternId), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250, 150, 0), 2, 8);
+				if (keyManager.isActive("cornersDebug")) {
+					cv::putText(frame, std::to_string(patternId), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250, 150, 0), 2, 8);
+				}
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
 				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints(orientation);
 				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
 				cameraMatrix.push_back(transformationMatrix.getViewMatrix());
 				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
 				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
-				for (auto& imagePoint : topImagePoints) {
-					if (keyManager.isActive("cornersDebug")) {
+				if (keyManager.isActive("cornersDebug")) {
+					for (auto& imagePoint : topImagePoints) {
 						cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 					}
 				}
