@@ -10,6 +10,7 @@ class KeyManager {
 public:
 	static std::unordered_map<char, std::string> keyToOptionsMap;
 	static std::unordered_map<std::string, bool> options;
+	static std::string keyString;
 
 	KeyManager(GLFWwindow* window);
 	static void keyPressed(char keyCode);

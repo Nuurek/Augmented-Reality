@@ -192,6 +192,7 @@
     <ClInclude Include="EdgelDetector.h" />
     <ClInclude Include="FrameDecorator.h" />
     <ClInclude Include="ARMarker.h" />
+    <ClInclude Include="ProgramMode.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LineSegment.h" />
     <ClInclude Include="LineSegmentDetector.h" />

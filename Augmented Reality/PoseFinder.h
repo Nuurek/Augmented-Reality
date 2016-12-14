@@ -16,15 +16,12 @@ using VectorOf2DPoints = std::vector<cv::Point2f>;
 
 
 class PoseFinder 
-	: public RegionBasedOperator
 {
 	CameraCalibration averageCameraCalibration;
 	const unsigned long maxNumberOfCalibrations = 1000;
 	unsigned long numberOfCalibrations = 0;
 
 public:
-	PoseFinder(const size_t borderSize, const size_t regionSize, const size_t stepSize);
-	CameraCalibration calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters);
 	ViewMatrix findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration);
 	VectorOf2DPoints getProjectedPoints(CameraCalibration cameraCalibration, ViewMatrix transformationVector, VectorOf3DPoints objectPoints);
 	static std::vector<cv::Point3f> getBottomOfTheCube3DPoints();

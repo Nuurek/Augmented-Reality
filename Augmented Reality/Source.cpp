@@ -9,6 +9,7 @@
 #include "KeyManager.h"
 #include "FrameDecorator.h"
 #include "CameraCalibrator.h"
+#include "ProgramMode.h"
 
 #define GLM_FORCE_RADIANS
 
@@ -31,9 +32,6 @@ const size_t BORDER_SIZE = 2;
 const size_t REGION_SIZE = 40;
 const size_t STEP_SIZE = 5;
 
-enum class MODE { IDLE, CALIBRATING, MARKER_FINDING, AUGMENTED_REALITY };
-MODE mode = MODE::IDLE;
-
 int exitWithError(const char * errorMessage) {
 	std::cerr << errorMessage << "\n";
 	return EXIT_FAILURE;
@@ -42,8 +40,6 @@ int exitWithError(const char * errorMessage) {
 int main(int argc, char** argv) {
 	cv::VideoCapture camera;
 	cv::Mat exampleImage;
-	CameraCalibrator cameraCalibrator(FRAMES_PER_CALIBRATION, CALIBRATION_DELAY);
-
 	if (USE_CAMERA) {
 		camera = cv::VideoCapture(0);
 
@@ -55,10 +51,7 @@ int main(int argc, char** argv) {
 		cv::resize(exampleImage, exampleImage, cv::Size(FRAME_WIDTH, FRAME_HEIGHT));
 	}
 
-	Drawer drawer;
-	drawer.init(FRAME_WIDTH,FRAME_HEIGHT);
-
-	auto videoWriter = cv::VideoWriter();
+	cv::VideoWriter videoWriter;
 	if (WRITE_VIDEO) {
 		videoWriter.open(
 			WRITE_FILENAME, cv::VideoWriter::fourcc('P', 'I', 'M', '1'), static_cast<double>(FPS), cv::Size(FRAME_WIDTH, FRAME_HEIGHT)
@@ -72,23 +65,27 @@ int main(int argc, char** argv) {
 	cv::Mat frame;
 	Buffer buffer;
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
-
-	KeyManager keyManager(drawer.getWindow());
-
 	detector.setBuffer(&buffer);
+	
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
-	bool isRunning=true;
 
+	CameraCalibrator cameraCalibrator(FRAMES_PER_CALIBRATION, CALIBRATION_DELAY);
 	CameraCalibration cameraCalibration;
 	cameraCalibration = cameraCalibrator.loadFromFile("camera-calibration.xml");
 
-	PoseFinder poseFinder(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
-	poseFinder.setBuffer(&buffer);
+	PoseFinder poseFinder;
+
+	Drawer drawer;
+	drawer.init(FRAME_WIDTH, FRAME_HEIGHT);
+	KeyManager keyManager(drawer.getWindow());
 
 	glfwSetTime(0);
 	float x, y, z; z = x = y = 0;
 	float angle = 0;
 	std::vector<glm::mat4> cameraMatrix;
+
+	Mode mode = Mode::IDLE;
+
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		if (USE_CAMERA) {
 			camera >> frame;
@@ -98,17 +95,17 @@ int main(int argc, char** argv) {
 
 		cameraMatrix.clear();
 
-		if (mode != MODE::CALIBRATING) {
-			if (keyManager.isActive("calibrating")) {
-				mode = MODE::CALIBRATING;
-			} else if (keyManager.isActive("markerFinding")) {
-				mode = MODE::MARKER_FINDING;
-			} else if (keyManager.isActive("augmentedReality")) {
-				mode = MODE::AUGMENTED_REALITY;
+		if (mode != Mode::CALIBRATING) {
+			if (keyManager.keyString == "calibrating") {
+				mode = Mode::CALIBRATING;
+			} else if (keyManager.keyString == "markerFinding") {
+				mode = Mode::MARKER_FINDING;
+			} else if (keyManager.keyString == "augmentedReality") {
+				mode = Mode::AUGMENTED_REALITY;
 			}
 		}
 
-		if (mode == MODE::CALIBRATING) {
+		if (mode == Mode::CALIBRATING) {
 			if (!cameraCalibrator.isSessionRunning()) {
 				cameraCalibrator.setFrameSize(frame.rows, frame.cols);
 				cameraCalibrator.startSession();
@@ -128,21 +125,21 @@ int main(int argc, char** argv) {
 
 					cameraCalibrator.saveToFile(cameraCalibration, "camera-calibration.xml");
 
-					mode = MODE::IDLE;
+					mode = Mode::IDLE;
 				}
 			}
 
 			if (!keyManager.isActive("calibrating")) {
-				mode = MODE::IDLE;
+				mode = Mode::IDLE;
 			}
 		}
 
-		if (mode == MODE::MARKER_FINDING || mode == MODE::AUGMENTED_REALITY) {
+		if (mode == Mode::MARKER_FINDING || mode == Mode::AUGMENTED_REALITY) {
 			buffer.setFrame(frame);
 			detector.findARMarkers();
 		}
 
-		if (mode == MODE::MARKER_FINDING) {
+		if (mode == Mode::MARKER_FINDING) {
 			if (keyManager.isActive("regions")) {
 				decorator.drawRegionLines(frame);
 			}
@@ -182,34 +179,14 @@ int main(int argc, char** argv) {
 			}
 
 			if (!keyManager.isActive("markerFinding")) {
-				mode = MODE::IDLE;
+				mode = Mode::IDLE;
 			}
 		}
 
-		if (mode == MODE::AUGMENTED_REALITY) {
+		if (mode == Mode::AUGMENTED_REALITY) {
 
 			auto markers = detector.getARMarkers();
 			auto numberOfMarkers = markers.size();
-
-			if (!markers.size()) {
-				continue;
-			}
-
-			auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
-			auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
-
-			for (auto& marker : markers) {
-				auto imagePoints = marker.getVectorizedForOpenCV();
-				imagePointsPatterns.push_back(imagePoints);
-			}
-
-			std::cout << cameraCalibration.cameraMatrix << "\n";
-			std::cout << cameraCalibration.distCoeffs << "\n";
-			auto focalX = cameraCalibration.cameraMatrix.at<double>(0, 0);
-			if (focalX > frame.cols * 2.0f) {
-				std::cout << "Camera calibration not found.\n";
-				continue;
-			}
 
 			for (auto& marker : markers) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
@@ -217,9 +194,7 @@ int main(int argc, char** argv) {
 				for (auto& imagePoint : imagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
 				}
-			}
 
-			for (auto& marker : markers) {
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
 				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
 				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
@@ -229,6 +204,10 @@ int main(int argc, char** argv) {
 				for (auto& imagePoint : topImagePoints) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
+			}
+
+			for (auto& marker : markers) {
+					
 			}
 
 			if (keyManager.isActive("escape"))
@@ -264,20 +243,12 @@ int main(int argc, char** argv) {
 				keyManager.keyPressed(GLFW_KEY_Q);
 			}
 
-			angle += glfwGetTime();
-			glfwSetTime(0);
-			glm::mat4 camRot = mat4(1.0f);
-			camRot = glm::rotate(camRot, radians(x), glm::vec3(1, 0, 0));
-			camRot = glm::rotate(camRot, radians(y), glm::vec3(0, 1, 0));
-			camRot = glm::rotate(camRot, radians(z), glm::vec3(0, 0, 1));
-			for (auto cameraMat = cameraMatrix.begin(); cameraMat != cameraMatrix.end(); cameraMat++) {
-				*cameraMat = camRot * (*cameraMat);
-			}
-
 			if (!keyManager.isActive("augmentedReality")) {
-				mode = MODE::IDLE;
+				mode = Mode::IDLE;
 			}
 		}
+
+		decorator.drawMode(frame, mode);
 
 		drawer.drawScene(&frame, cameraMatrix);
 

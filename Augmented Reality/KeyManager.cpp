@@ -18,12 +18,13 @@ std::unordered_map<char, std::string> KeyManager::keyToOptionsMap {
 	{ GLFW_KEY_S, "S" },
 	{ GLFW_KEY_E, "E" },
 	{ GLFW_KEY_Q, "Q" },
-	{ GLFW_KEY_C, "calibrating"},
-	{ GLFW_KEY_V, "markerFinding"},
-	{ GLFW_KEY_B, "augmentedReality"},
+	{ GLFW_KEY_C, "calibrating" },
+	{ GLFW_KEY_V, "markerFinding" },
+	{ GLFW_KEY_B, "augmentedReality" },
 };
 
 std::unordered_map<std::string, bool> KeyManager::options = {};
+std::string KeyManager::keyString = "";
 
 KeyManager::KeyManager(GLFWwindow * window) 
 	: window(window) {
@@ -31,12 +32,13 @@ KeyManager::KeyManager(GLFWwindow * window)
 }
 
 void KeyManager::keyPressed(char keyCode) {
-	std::string option = keyToOptionsMap[keyCode];
-	if (option == "") {
-		return;
+	auto option = keyToOptionsMap[keyCode];
+	if (option != "") {
+		bool previousState = options[option];
+		options[option] = !previousState;
+
+		keyString = option;
 	}
-	bool previousState = options[option];
-	options[option] = !previousState;
 }
 
 bool KeyManager::isActive(std::string option) {

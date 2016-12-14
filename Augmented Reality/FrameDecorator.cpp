@@ -50,6 +50,15 @@ void FrameDecorator::drawARMarkers(cv::Mat & frame, std::vector<ARMarker> marker
 	}
 }
 
+void FrameDecorator::drawMode(cv::Mat & frame, Mode mode) {
+	auto text = modeToStringMap[mode];
+
+	auto origin = cv::Point(10, 20);
+	auto fontFace = CV_FONT_HERSHEY_COMPLEX;
+
+	cv::putText(frame, text, origin, fontFace, 0.5, cv::Scalar{ 0, 0, 255 });
+}
+
 void FrameDecorator::drawEdgel(cv::Mat & frame, Edgel & edgel) {
 	cv::Point center(static_cast<int>(edgel.position.x), static_cast<int>(edgel.position.y));
 	auto red = 127.0 + edgel.slope.x * 128.0;
@@ -86,3 +95,9 @@ void FrameDecorator::drawLine(cv::Mat& frame, Vector2f& start, Vector2f& end, cv
 	cv::line(frame, startPoint, endPoint, color, thickness);
 }
 
+std::unordered_map<Mode, std::string> FrameDecorator::modeToStringMap = {
+	{ Mode::IDLE, "Idle" },
+	{ Mode::CALIBRATING, "Calibration" },
+	{ Mode::MARKER_FINDING, "Marker finding" },
+	{ Mode::AUGMENTED_REALITY, "Augmented Reality" }
+};
