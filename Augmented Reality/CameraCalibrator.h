@@ -26,7 +26,7 @@ class CameraCalibrator {
 public:
 	CameraCalibrator(size_t numberOfFrames, float delayBetweenFrames);
 	void setFrameSize(int width, int height);
-	void startSession() throw (CalibrationException);
+	void startSession();
 	bool isSessionRunning() const;
 	bool addFrame(cv::Mat& frame);
 	bool isSessionFinished() const;

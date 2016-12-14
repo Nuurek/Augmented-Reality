@@ -185,6 +185,7 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="CameraCalibration.h" />
     <ClInclude Include="CameraCalibrator.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Drawer.h" />
     <ClInclude Include="CornersFinder.h" />

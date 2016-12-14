@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <chrono>
+
+#include "Config.h"
 #include "PoseFinder.h"
 #include "Drawer.h"
 #include "Buffer.h"
@@ -13,31 +15,14 @@
 
 #define GLM_FORCE_RADIANS
 
-const unsigned int FPS = 30;
-const unsigned int FRAME_WIDTH = 640;
-const unsigned int FRAME_HEIGHT = 480;
-const char* WINDOW_NAME = "Camera capture";
-
-const bool USE_CAMERA = true;
-const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
-
-const bool WRITE_VIDEO = true;
-const char* WRITE_FILENAME = "capture.mpeg";
-
-const bool CALIBRATION = true;
-const size_t FRAMES_PER_CALIBRATION = 30;
-const float CALIBRATION_DELAY = 1.0f;
-
-const size_t BORDER_SIZE = 2;
-const size_t REGION_SIZE = 40;
-const size_t STEP_SIZE = 5;
-
 int exitWithError(const char * errorMessage) {
 	std::cerr << errorMessage << "\n";
 	return EXIT_FAILURE;
 }
 
 int main(int argc, char** argv) {
+	loadConfig("config.xml");
+
 	cv::VideoCapture camera;
 	cv::Mat exampleImage;
 	if (USE_CAMERA) {
@@ -85,8 +70,11 @@ int main(int argc, char** argv) {
 	std::vector<glm::mat4> cameraMatrix;
 
 	Mode mode = Mode::IDLE;
+	int frameTimeInMS = 1000 / FPS;
 
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
+		auto start = std::chrono::steady_clock::now();
+
 		if (USE_CAMERA) {
 			camera >> frame;
 		} else {
@@ -260,7 +248,16 @@ int main(int argc, char** argv) {
 			glfwSetWindowShouldClose(drawer.getWindow(), true);
 		}
 
-		cv::waitKey(10);
+		auto end = std::chrono::steady_clock::now();
+		std::chrono::duration<float> duration = end - start;
+		auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+		auto timeToWait = frameTimeInMS - milliseconds;
+		if (timeToWait < 1) {
+			timeToWait = 1;
+		}
+
+		cv::waitKey(timeToWait);
 		keyManager.handleEvents();
 	}
 
