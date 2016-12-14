@@ -83,10 +83,12 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	objLoader->loadOBJ("data/football.obj");
 	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/football.png"));
 	delete objLoader;
+	/*
 	objLoader = new OBJloader();
 	objLoader->loadOBJ("data/plane.obj");
 	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/plane.png"));
 	delete objLoader;
+	*/
 
 	//Background
 	bufVertices = makeBuffer(backgroundModel.vertices, backgroundModel.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków
