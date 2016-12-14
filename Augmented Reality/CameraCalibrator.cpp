@@ -29,7 +29,7 @@ bool CameraCalibrator::addFrame(cv::Mat& frame) {
 	std::chrono::duration<float> duration = now - lastFrameTakenTime;
 	auto durationInSeconds = duration.count();
 
-	bool found;
+	bool found = false;
 
 	if (durationInSeconds > delayInSeconds) {
 		std::vector<cv::Point2f> pointsBuffer;
