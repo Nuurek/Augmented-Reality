@@ -257,7 +257,7 @@ int main(int argc, char** argv) {
 
 		decorator.drawMode(frame, mode);
 
-		drawer.drawScene(&frame, cameraMatrix, objectIds);
+		drawer.drawScene(frame, cameraMatrix, objectIds);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);

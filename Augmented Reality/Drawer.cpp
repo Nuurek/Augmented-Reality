@@ -40,6 +40,8 @@ void Drawer::init(int frameWidth, int frameHeight)
 	}
 	aspectRatio = (float)frameHeight / (float)frameWidth;
 	window = glfwCreateWindow(frameWidth, frameHeight, "AR Markers", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
+	this->frameWidth = frameWidth;
+	this->frameHeight = frameHeight;
 
 	if (!window) //Je¿eli okna nie uda³o siê utworzyæ, to zamknij program
 	{
@@ -159,7 +161,19 @@ void Drawer::drawScene(cv::Mat& frame, std::vector<glm::mat4> cameraMatrix, std:
 
 	glfwSwapBuffers(window);
 
+	
+	cv::Mat img(frameHeight, frameWidth, CV_8UC3);
+	//use fast 4-byte alignment (default anyway) if possible
+	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
+
+	//set length of one complete row in destination data (doesn't need to equal img.cols)
+	glPixelStorei(GL_PACK_ROW_LENGTH, img.step / img.elemSize());
+
+	glReadPixels(0, 0, img.cols, img.rows, GL_BGR, GL_UNSIGNED_BYTE, img.data);
+
+	cv::flip(img, frame, 0);
 }
+
 void Drawer::drawObject(GLuint vao, ShaderProgram *shader, mat4 mP, mat4 mV, mat4 mM, int vertexCount, GLuint texture) {
 	shader->use();
 

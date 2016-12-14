@@ -35,6 +35,8 @@ private:
 	GLuint tex0;
 	GLuint currentFrameTex;
 
+	int frameWidth, frameHeight;
+
 	ShaderProgram *shaderProgram;
 	ShaderProgram *backgroundShaderProgram;
 	GLuint vao;
