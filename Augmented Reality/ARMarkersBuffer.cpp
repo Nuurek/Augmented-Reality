@@ -1,5 +1,8 @@
 #include "ARMarkersBuffer.h"
 
+ARMarkersBuffer::ARMarkersBuffer(long expirationTimeInMs) 
+	: bufferExpirationTimeInMs(expirationTimeInMs) {}
+
 void ARMarkersBuffer::saveToBuffer(std::vector<ARMarker> newMarkers) {
 	markersBuffer = newMarkers;
 	lastSaveTime = std::chrono::steady_clock::now();

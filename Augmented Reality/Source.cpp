@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	detector.setBuffer(&buffer);
 	std::vector<ARMarker> markers;
-	ARMarkersBuffer markersBuffer;
+	ARMarkersBuffer markersBuffer(MARKERS_BUFFER_EXPIRATION_TIME);
 	
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
