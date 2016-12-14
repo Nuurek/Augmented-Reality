@@ -9,7 +9,6 @@
 #include "KeyManager.h"
 #include "FrameDecorator.h"
 #include "PatternRecognition.h"
-
 #define GLM_FORCE_RADIANS
 
 const unsigned int FPS = 30;
@@ -51,7 +50,7 @@ int main(int argc, char** argv) {
 	//cv::namedWindow(WINDOW_NAME);
 	Drawer drawer;
 	drawer.init(FRAME_WIDTH,FRAME_HEIGHT);
-
+	PatternRecognition::init();
 	auto videoWriter = cv::VideoWriter();
 	if (WRITE_VIDEO) {
 		videoWriter.open(
@@ -162,17 +161,16 @@ int main(int argc, char** argv) {
 					}
 					cameraMatrix.clear();
 					objectId.clear();
-					char* str;
 					for (auto& marker : markers) {
 						auto imagePoints = marker.getVectorizedForOpenCV();
-						int patternId = PatternRecognition::getPatternId(frame, imagePoints);
-						if (patternId < 0) {
+						unsigned patternId = PatternRecognition::getPatternId(frame, imagePoints);
+						if (patternId == INT_MAX) {
 							cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
 							continue;
 						}
 						int orientation = patternId % 10;
 						objectId.push_back(patternId/10);
-						cv::putText(frame, itoa(patternId, str, 10), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250,150,0), 2, 8);
+						cv::putText(frame, std::to_string(patternId), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250,150,0), 2, 8);
 						auto bottomImagePoints = marker.getVectorizedForOpenCV();
 						auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints(orientation);
 						auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);

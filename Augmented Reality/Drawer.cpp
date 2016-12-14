@@ -131,15 +131,17 @@ GLuint Drawer::makeBuffer(void *data, int vertexCount, int vertexSize) {
 //Procedura rysuj¹ca zawartoœæ sceny
 void Drawer::drawScene(cv::Mat *frame, std::vector<glm::mat4> cameraMatrix, std::vector<int> objectId) {
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 P = glm::perspective(glm::radians(39.f), 4.f/3.f, 0.1f, 100.0f);
+	glm::mat4 P = glm::perspective(glm::radians(39.f), 4.f / 3.f, 0.1f, 100.0f);
 
 	glm::mat4 M = glm::mat4(1.0f);
 
 	readFrame(frame, currentFrameTex);
-	for(int i=0;i<cameraMatrix.size();i++)
+	for (int i = 0; i < cameraMatrix.size(); i++) {
+		if (objectId[i] >= glModels.size()) objectId[i] = 0;
 		drawObject(glModels[objectId[i]]->vao, shaderProgram, P, cameraMatrix[i], M, glModels[objectId[i]]->vertexCount, glModels[objectId[i]]->texture);
+	}
 
 	drawBackground(backgroundVAO, backgroundShaderProgram, backgroundModel, currentFrameTex);
 

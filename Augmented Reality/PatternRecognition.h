@@ -9,9 +9,14 @@
 class PatternRecognition
 {
 public:
-	static int getPatternId(cv::Mat& frame, std::vector<cv::Point2f> imagePoints);
-	static std::map<unsigned, int> codesDictionary;
+	static void init();
+	static unsigned long getPatternId(cv::Mat& frame, std::vector<cv::Point2f> imagePoints);
+	static std::map<unsigned long, unsigned> codesDictionary;
 	static const int frameSize = 200.f;
-	static const int DEBUG_WINDOW = false;
+	static const int DEBUG_WINDOW = true;
+private:
+	static void loadMarker(int id);
+	static void addMarker(int id, cv::Mat & image, int orientation);
+	static int cvMatToVal(cv::Mat & image);
 };
 
