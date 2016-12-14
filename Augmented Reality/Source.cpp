@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 			auto numberOfMarkers = markers.size();
 			
 			if (markers.size()>0) {
-				auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints());
+				auto objectsPointsPatterns = std::vector<std::vector<cv::Point3f>>(numberOfMarkers, PoseFinder::getBottomOfTheCube3DPoints(0)); //podaæ odpowiedni¹ orientacjê
 				auto imagePointsPatterns = std::vector<std::vector<cv::Point2f>>();
 
 				for (auto& marker : markers) {
@@ -170,10 +170,11 @@ int main(int argc, char** argv) {
 							cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
 							continue;
 						}
-						objectId.push_back(patternId);
+						int orientation = patternId % 10;
+						objectId.push_back(patternId/10);
 						cv::putText(frame, itoa(patternId, str, 10), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250,150,0), 2, 8);
 						auto bottomImagePoints = marker.getVectorizedForOpenCV();
-						auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
+						auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints(orientation);
 						auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
 						cameraMatrix.push_back(transformationMatrix.getViewMatrix());
 						auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();

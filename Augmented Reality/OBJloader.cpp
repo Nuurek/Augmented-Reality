@@ -56,18 +56,21 @@ bool OBJloader::loadOBJ(const char * path)
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 		out_vertices.push_back(vertex);
 	}
+	temp_vertices.clear();
 
 	for (unsigned int i = 0; i < normalIndices.size(); i++) {
 		unsigned int normalIndex = normalIndices[i];
 		glm::vec3 normal = temp_normals[normalIndex - 1];
 		out_normals.push_back(normal);
 	}
+	temp_normals.clear();
 
 	for (unsigned int i = 0; i < uvIndices.size(); i++) {
 		unsigned int uvIndex = uvIndices[i];
 		glm::vec2 uv = temp_uvs[uvIndex - 1];
 		out_uvs.push_back(uv);
 	}
+	temp_uvs.clear();
 }
 
 GLModel* OBJloader::getGlModel(ShaderProgram* shaderProgram, char* textureName)
@@ -76,10 +79,11 @@ GLModel* OBJloader::getGlModel(ShaderProgram* shaderProgram, char* textureName)
 	//GLuint bufColors;
 	GLuint bufNormals; 
 	GLuint bufTexCoords;
-	
-	bufVertices = makeBuffer(&out_vertices[0], out_vertices.size(), sizeof(glm::vec4));
-	bufNormals = makeBuffer(&out_normals[0], out_normals.size(), sizeof(glm::vec4));
-	bufTexCoords = makeBuffer(&out_uvs[0], out_uvs.size(), sizeof(glm::vec2));
+
+	int vertexCount = out_vertices.size();
+	bufVertices = makeBuffer(&out_vertices[0], vertexCount, sizeof(glm::vec4));
+	bufNormals = makeBuffer(&out_normals[0], vertexCount, sizeof(glm::vec4));
+	bufTexCoords = makeBuffer(&out_uvs[0], vertexCount, sizeof(glm::vec2));
 
 	GLuint VAO;
 
@@ -98,7 +102,7 @@ GLModel* OBJloader::getGlModel(ShaderProgram* shaderProgram, char* textureName)
 	GLModel * glModel = new GLModel();
 	glModel->vao = VAO;
 	glModel->texture = readTexture(textureName);
-	glModel->vertexCount = out_vertices.size();
+	glModel->vertexCount = vertexCount;
 	return glModel;
 }
 

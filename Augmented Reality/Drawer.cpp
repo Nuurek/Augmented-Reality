@@ -84,7 +84,6 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/football.png"));
 	delete objLoader;
 
-
 	//Background
 	bufVertices = makeBuffer(backgroundModel.vertices, backgroundModel.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków
 	bufColors = makeBuffer(backgroundModel.colors, backgroundModel.vertexCount, sizeof(float) * 4);//VBO z kolorami wierzcho³ków

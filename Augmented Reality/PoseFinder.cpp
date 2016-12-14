@@ -54,8 +54,13 @@ VectorOf2DPoints PoseFinder::getProjectedPoints(CameraCalibration cameraCalibrat
 }
 
 
-std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints() {
-	return std::vector<cv::Point3f>{ {-1.0, -1.0, -1.0}, { -1.0, 1.0, -1.0 }, { 1.0, 1.0, -1.0 }, { 1.0, -1.0, -1.0 }};
+std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints(int orientation) {
+	std::vector<cv::Point3f> bottomPoints = std::vector<cv::Point3f>{ {-1.0, -1.0, -1.0}, 
+										{ -1.0, 1.0, -1.0 }, 
+										{ 1.0, 1.0, -1.0 }, 
+										{ 1.0, -1.0, -1.0 }};
+	std::rotate(bottomPoints.begin(), bottomPoints.begin() + 1, bottomPoints.end());
+	return bottomPoints;
 }
 
 std::vector<cv::Point3f> PoseFinder::getTopOfTheCube3DPoints() {

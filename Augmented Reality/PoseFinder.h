@@ -39,7 +39,7 @@ public:
 	CameraCalibration calibrateCamera(std::vector<VectorOf3DPoints> objectPointsPatterns, std::vector<VectorOf2DPoints> imagePointsPatters);
 	TransformationMatrix findTransformaton(VectorOf3DPoints objectPoints, VectorOf2DPoints imagePoints, CameraCalibration cameraCalibration);
 	VectorOf2DPoints getProjectedPoints(CameraCalibration cameraCalibration, TransformationMatrix transformationVector, VectorOf3DPoints objectPoints);
-	static std::vector<cv::Point3f> getBottomOfTheCube3DPoints();
+	static std::vector<cv::Point3f> getBottomOfTheCube3DPoints(int orientation);
 	static std::vector<cv::Point3f> getTopOfTheCube3DPoints();
 };
 
