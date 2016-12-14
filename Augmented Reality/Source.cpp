@@ -13,6 +13,7 @@
 #include "CameraCalibrator.h"
 #include "ProgramMode.h"
 #include "PatternRecognition.h"
+#include "ARMarkersBuffer.h"
 #define GLM_FORCE_RADIANS
 
 int exitWithError(const char * errorMessage) {
@@ -52,6 +53,8 @@ int main(int argc, char** argv) {
 	Buffer buffer;
 	ARMarkerDetector detector(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 	detector.setBuffer(&buffer);
+	std::vector<ARMarker> markers;
+	ARMarkersBuffer markersBuffer;
 	
 	FrameDecorator decorator(BORDER_SIZE, REGION_SIZE, STEP_SIZE);
 
@@ -70,10 +73,10 @@ int main(int argc, char** argv) {
 	float angle = 0;
 	std::vector<glm::mat4> cameraMatrix;
 
+	std::vector<int> objectIds;
+
 	Mode mode = Mode::IDLE;
 	int frameTimeInMS = 1000 / FPS;
-
-	std::vector<int> objectIds;
 
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		auto start = std::chrono::steady_clock::now();
@@ -125,6 +128,14 @@ int main(int argc, char** argv) {
 		if (mode == Mode::MARKER_FINDING || mode == Mode::AUGMENTED_REALITY) {
 			buffer.setFrame(frame);
 			detector.findARMarkers();
+
+			markers = detector.getARMarkers();
+
+			if (markers.size() < markersBuffer.getBufferedMarkersSize() && markersBuffer.isBufferUpToDate()) {
+				markers = markersBuffer.loadFromBuffer();
+			} else {
+				markersBuffer.saveToBuffer(markers);
+			}
 		}
 
 		if (mode == Mode::MARKER_FINDING) {
@@ -162,7 +173,6 @@ int main(int argc, char** argv) {
 			}
 
 			if (keyManager.isActive("markers")) {
-				auto markers = detector.getARMarkers();
 				decorator.drawARMarkers(frame, markers);
 			}
 
@@ -173,7 +183,6 @@ int main(int argc, char** argv) {
 
 		if (mode == Mode::AUGMENTED_REALITY) {
 
-			auto markers = detector.getARMarkers();
 			auto numberOfMarkers = markers.size();
 
 			for (auto& marker : markers) {
