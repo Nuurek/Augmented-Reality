@@ -32,7 +32,7 @@ std::vector<cv::Point3f> PoseFinder::getBottomOfTheCube3DPoints(int orientation)
 										{ -1.0, 1.0, -1.0 }, 
 										{ 1.0, 1.0, -1.0 }, 
 										{ 1.0, -1.0, -1.0 }};
-	std::rotate(bottomPoints.begin(), bottomPoints.begin() + 1, bottomPoints.end());
+	std::rotate(bottomPoints.begin(), bottomPoints.begin() + orientation, bottomPoints.end());
 	return bottomPoints;
 }
 
