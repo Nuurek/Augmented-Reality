@@ -11,7 +11,6 @@ std::unordered_map<char, std::string> KeyManager::keyToOptionsMap {
 	{ GLFW_KEY_7, "lineSegmentsWithCorner" },
 	{ GLFW_KEY_8, "markers" },
 	{ GLFW_KEY_ESCAPE, "escape" },
-	{ GLFW_KEY_P, "poseFinderExample" },
 	{ GLFW_KEY_W, "W" },
 	{ GLFW_KEY_A, "A" },
 	{ GLFW_KEY_D, "D" },
@@ -21,6 +20,7 @@ std::unordered_map<char, std::string> KeyManager::keyToOptionsMap {
 	{ GLFW_KEY_C, "calibrating" },
 	{ GLFW_KEY_V, "markerFinding" },
 	{ GLFW_KEY_B, "augmentedReality" },
+	{ GLFW_KEY_P, "cornersDebug" },
 };
 
 std::unordered_map<std::string, bool> KeyManager::options = {};
@@ -32,6 +32,7 @@ KeyManager::KeyManager(GLFWwindow * window)
 }
 
 void KeyManager::keyPressed(char keyCode) {
+	std::cout << "Key pressed: " << keyCode << "\n";
 	auto option = keyToOptionsMap[keyCode];
 	if (option != "") {
 		bool previousState = options[option];

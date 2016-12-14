@@ -179,11 +179,14 @@ int main(int argc, char** argv) {
 			for (auto& marker : markers) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
 
-				for (auto& imagePoint : imagePoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
+				if (keyManager.isActive("cornersDebug")) {
+					std::cout << "Debug corners\n";
+					for (auto& imagePoint : imagePoints) {
+						cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
+					}
 				}
 
-				unsigned patternId = PatternRecognition::getPatternId(frame, imagePoints);
+				unsigned int patternId = PatternRecognition::getPatternId(frame, imagePoints);
 				if (patternId == INT_MAX) {
 					cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
 					continue;
@@ -198,7 +201,9 @@ int main(int argc, char** argv) {
 				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
 				auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
 				for (auto& imagePoint : topImagePoints) {
-					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
+					if (keyManager.isActive("cornersDebug")) {
+						cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
+					}
 				}
 			}
 
