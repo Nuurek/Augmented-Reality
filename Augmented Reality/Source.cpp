@@ -73,7 +73,8 @@ int main(int argc, char** argv) {
 	Mode mode = Mode::IDLE;
 	int frameTimeInMS = 1000 / FPS;
 
-	std::vector<int> objectId;
+	std::vector<int> objectIds;
+
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		auto start = std::chrono::steady_clock::now();
 
@@ -188,10 +189,10 @@ int main(int argc, char** argv) {
 					continue;
 				}
 				int orientation = patternId % 10;
-				objectId.push_back(patternId / 10);
+				objectIds.push_back(patternId / 10);
 				cv::putText(frame, std::to_string(patternId), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250, 150, 0), 2, 8);
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
-				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
+				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints(orientation);
 				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
 				cameraMatrix.push_back(transformationMatrix.getViewMatrix());
 				auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
@@ -200,20 +201,6 @@ int main(int argc, char** argv) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
 			}
-			
-		} else {
-
-			cameraMatrix.clear();
-			objectId.clear();
-			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
-				glm::vec3(10.0f*cos(angle), 10.0f*sin(angle), 0.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(0.0f, 1.0f, 0.0f)));
-			objectId.push_back(0);
-		}
-
-			if (keyManager.isActive("escape"))
-				glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
 
 			if (keyManager.isActive("W")) {
 				y += 15;
@@ -252,7 +239,7 @@ int main(int argc, char** argv) {
 
 		decorator.drawMode(frame, mode);
 
-		drawer.drawScene(&frame, cameraMatrix, objectID);
+		drawer.drawScene(&frame, cameraMatrix, objectIds);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);
