@@ -22,6 +22,7 @@ int BORDER_SIZE;
 int REGION_SIZE;
 int STEP_SIZE;
 
+int MARKERS_BUFFER_EXPIRATION_TIME;
 
 void loadConfig(std::string filename) {
 	cv::FileStorage fileStorage(filename, cv::FileStorage::READ);
@@ -39,6 +40,7 @@ void loadConfig(std::string filename) {
 	fileStorage["BORDER_SIZE"] >> BORDER_SIZE;
 	fileStorage["REGION_SIZE"] >> REGION_SIZE;
 	fileStorage["STEP_SIZE"] >> STEP_SIZE;
+	fileStorage["MARKERS_BUFFER_EXPIRATION_TIME"] >> MARKERS_BUFFER_EXPIRATION_TIME;
 
 	fileStorage.release();
 }

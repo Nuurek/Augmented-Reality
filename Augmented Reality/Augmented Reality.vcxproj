@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="ARMarker.cpp" />
     <ClCompile Include="ARMarkerDetector.cpp" />
+    <ClCompile Include="ARMarkersBuffer.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="CameraCalibration.cpp" />
     <ClCompile Include="CameraCalibrator.cpp" />
@@ -185,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ARMarkerDetector.h" />
+    <ClInclude Include="ARMarkersBuffer.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="CameraCalibration.h" />
     <ClInclude Include="CameraCalibrator.h" />
