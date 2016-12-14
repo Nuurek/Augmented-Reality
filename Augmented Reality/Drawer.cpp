@@ -79,16 +79,22 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	objLoader->loadOBJ("data/mustang.obj");
 	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/mustang.png"));
 	delete objLoader;
+
 	objLoader = new OBJloader();
 	objLoader->loadOBJ("data/football.obj");
 	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/football.png"));
 	delete objLoader;
-	/*
+
 	objLoader = new OBJloader();
-	objLoader->loadOBJ("data/plane.obj");
-	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/plane.png"));
+	objLoader->loadOBJ("data/dog.obj");
+	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/dog.png"));
 	delete objLoader;
-	*/
+
+	objLoader = new OBJloader();
+	objLoader->loadOBJ("data/cube.obj");
+	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/testTex.png"));
+	delete objLoader;
+	
 
 	//Background
 	bufVertices = makeBuffer(backgroundModel.vertices, backgroundModel.vertexCount, sizeof(float) * 4); //VBO ze wspó³rzêdnymi wierzcho³ków

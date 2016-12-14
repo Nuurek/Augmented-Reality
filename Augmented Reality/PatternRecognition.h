@@ -13,7 +13,7 @@ public:
 	static unsigned long getPatternId(cv::Mat& frame, std::vector<cv::Point2f> imagePoints);
 	static std::map<unsigned long, unsigned> codesDictionary;
 	static const int frameSize = 200.f;
-	static const int DEBUG_WINDOW = true;
+	static const int DEBUG_WINDOW = false;
 private:
 	static void loadMarker(int id);
 	static void addMarker(int id, cv::Mat & image, int orientation);

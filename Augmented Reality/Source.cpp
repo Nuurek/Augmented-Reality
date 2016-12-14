@@ -175,7 +175,8 @@ int main(int argc, char** argv) {
 
 			auto markers = detector.getARMarkers();
 			auto numberOfMarkers = markers.size();
-
+			objectIds.clear();
+			cameraMatrix.clear();
 			for (auto& marker : markers) {
 				auto imagePoints = marker.getVectorizedForOpenCV();
 
