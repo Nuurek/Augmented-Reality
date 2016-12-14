@@ -18,6 +18,7 @@ const unsigned int FRAME_HEIGHT = 480;
 const char* WINDOW_NAME = "Camera capture";
 
 const bool USE_CAMERA = true;
+const bool DEBUG_CORNERS = false;
 const char* EXAMPLE_IMAGE_FILENAME = "example.jpg";
 
 const bool WRITE_VIDEO = true;
@@ -152,6 +153,7 @@ int main(int argc, char** argv) {
 					std::cout << "Camera calibration not found.\n";		
 				}
 				else {
+					if(DEBUG_CORNERS)
 					for (auto& marker : markers) {
 						auto imagePoints = marker.getVectorizedForOpenCV();
 						for (auto& imagePoint : imagePoints) {
@@ -176,9 +178,10 @@ int main(int argc, char** argv) {
 						cameraMatrix.push_back(transformationMatrix.getViewMatrix());
 						auto topObjectPoints = PoseFinder::getTopOfTheCube3DPoints();
 						auto topImagePoints = poseFinder.getProjectedPoints(cameraCalibration, transformationMatrix, topObjectPoints);
-						for (auto& imagePoint : topImagePoints) {
-							cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
-						}
+						if (DEBUG_CORNERS)
+							for (auto& imagePoint : topImagePoints) {
+								cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
+							}
 					}
 				}
 
