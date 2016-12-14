@@ -12,7 +12,7 @@
 #include "FrameDecorator.h"
 #include "CameraCalibrator.h"
 #include "ProgramMode.h"
-
+#include "PatternRecognition.h"
 #define GLM_FORCE_RADIANS
 
 int exitWithError(const char * errorMessage) {
@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 	}
 
 	cv::VideoWriter videoWriter;
+	PatternRecognition::init();
 	if (WRITE_VIDEO) {
 		videoWriter.open(
 			WRITE_FILENAME, cv::VideoWriter::fourcc('P', 'I', 'M', '1'), static_cast<double>(FPS), cv::Size(FRAME_WIDTH, FRAME_HEIGHT)
@@ -72,6 +73,7 @@ int main(int argc, char** argv) {
 	Mode mode = Mode::IDLE;
 	int frameTimeInMS = 1000 / FPS;
 
+	std::vector<int> objectId;
 	while (!glfwWindowShouldClose(drawer.getWindow())) {
 		auto start = std::chrono::steady_clock::now();
 
@@ -80,9 +82,6 @@ int main(int argc, char** argv) {
 		} else {
 			frame = exampleImage.clone();
 		}
-
-		cameraMatrix.clear();
-
 		if (mode != Mode::CALIBRATING) {
 			if (keyManager.keyString == "calibrating") {
 				mode = Mode::CALIBRATING;
@@ -183,6 +182,14 @@ int main(int argc, char** argv) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(0, 0, 255), -1);
 				}
 
+				unsigned patternId = PatternRecognition::getPatternId(frame, imagePoints);
+				if (patternId == INT_MAX) {
+					cv::putText(frame, "Nope", imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(50, 50, 50), 2, 8);
+					continue;
+				}
+				int orientation = patternId % 10;
+				objectId.push_back(patternId / 10);
+				cv::putText(frame, std::to_string(patternId), imagePoints[3], cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(250, 150, 0), 2, 8);
 				auto bottomImagePoints = marker.getVectorizedForOpenCV();
 				auto bottomObjectPoints = PoseFinder::getBottomOfTheCube3DPoints();
 				auto transformationMatrix = poseFinder.findTransformaton(bottomObjectPoints, bottomImagePoints, cameraCalibration);
@@ -193,10 +200,17 @@ int main(int argc, char** argv) {
 					cv::circle(frame, imagePoint, 5, CV_RGB(255, 0, 0), -1);
 				}
 			}
+			
+		} else {
 
-			for (auto& marker : markers) {
-					
-			}
+			cameraMatrix.clear();
+			objectId.clear();
+			cameraMatrix.push_back(glm::lookAt( //Wylicz macierz widoku
+				glm::vec3(10.0f*cos(angle), 10.0f*sin(angle), 0.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f)));
+			objectId.push_back(0);
+		}
 
 			if (keyManager.isActive("escape"))
 				glfwSetWindowShouldClose(drawer.getWindow(), GLFW_TRUE);
@@ -238,7 +252,7 @@ int main(int argc, char** argv) {
 
 		decorator.drawMode(frame, mode);
 
-		drawer.drawScene(&frame, cameraMatrix);
+		drawer.drawScene(&frame, cameraMatrix, objectID);
 
 		if (WRITE_VIDEO) {
 			videoWriter.write(frame);

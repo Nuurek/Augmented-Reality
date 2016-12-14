@@ -165,6 +165,7 @@
     <ClCompile Include="Edgel.cpp" />
     <ClCompile Include="EdgelDetector.cpp" />
     <ClCompile Include="FrameDecorator.cpp" />
+    <ClCompile Include="GLModel.cpp" />
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="LineSegment.cpp" />
     <ClCompile Include="LineSegmentDetector.cpp" />
@@ -172,6 +173,8 @@
     <ClCompile Include="LineSegmentMerger.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="MarkerFinder.cpp" />
+    <ClCompile Include="OBJloader.cpp" />
+    <ClCompile Include="PatternRecognition.cpp" />
     <ClCompile Include="PoseFinder.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RegionBasedOperator.cpp" />
@@ -193,6 +196,7 @@
     <ClInclude Include="EdgelDetector.h" />
     <ClInclude Include="FrameDecorator.h" />
     <ClInclude Include="ARMarker.h" />
+    <ClInclude Include="GLModel.h" />
     <ClInclude Include="ProgramMode.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LineSegment.h" />
@@ -201,6 +205,8 @@
     <ClInclude Include="LineSegmentMerger.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="OBJloader.h" />
+    <ClInclude Include="PatternRecognition.h" />
     <ClInclude Include="PoseFinder.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="MarkerFinder.h" />
