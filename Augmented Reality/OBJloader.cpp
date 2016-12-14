@@ -73,7 +73,7 @@ bool OBJloader::loadOBJ(const char * path)
 	temp_uvs.clear();
 }
 
-GLModel* OBJloader::getGlModel(ShaderProgram* shaderProgram, char* textureName)
+GLModel* OBJloader::getGlModel(ShaderProgram* shaderProgram, const char* textureName)
 {
 	GLuint bufVertices;
 	//GLuint bufColors;
@@ -124,7 +124,7 @@ void OBJloader::assignVBOtoAttribute(ShaderProgram *shaderProgram, char* attribu
 	glEnableVertexAttribArray(location); 
 	glVertexAttribPointer(location, vertexSize, GL_FLOAT, GL_FALSE, 0, NULL); 
 }
-GLuint OBJloader::readTexture(char* filename) {
+GLuint OBJloader::readTexture(const char* filename) {
 	GLuint tex;
 	glActiveTexture(GL_TEXTURE0);
 

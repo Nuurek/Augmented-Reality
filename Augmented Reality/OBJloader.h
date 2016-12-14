@@ -7,7 +7,7 @@ class OBJloader
 {
 public:
 	bool loadOBJ(const char * path);
-	GLModel* getGlModel(ShaderProgram* shaderProgram, char* textureName);
+	GLModel* getGlModel(ShaderProgram* shaderProgram, const char* textureName);
 private:
 	std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 	std::vector< glm::vec3 > temp_vertices;
@@ -20,7 +20,7 @@ private:
 
 	GLuint makeBuffer(void * data, int vertexCount, int vertexSize);
 	void assignVBOtoAttribute(ShaderProgram * shaderProgram, char * attributeName, GLuint bufVBO, int vertexSize);
-	GLuint readTexture(char * filename);
+	GLuint readTexture(const char * filename);
 	
 };
 

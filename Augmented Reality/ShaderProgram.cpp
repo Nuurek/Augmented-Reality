@@ -35,7 +35,6 @@ char* ShaderProgram::readFile(char* fileName) {
 	fread(result,1,filesize,plik);
 	result[filesize]='\0';
 	printf("size: %d", filesize);
-	printf("result %s\n", result);
 	fclose(plik);
 
 	return result;

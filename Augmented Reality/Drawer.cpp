@@ -77,25 +77,18 @@ void Drawer::initOpenGLProgram(GLFWwindow* window) {
 	shaderProgram = new ShaderProgram("vshader.vert", NULL, "fshader.frag"); //Wczytaj program cieniuj¹cy
 	backgroundShaderProgram = new ShaderProgram("backgroundVshader.vert", NULL, "backgroundFshader.frag");	
 
-	OBJloader* objLoader = new OBJloader();
-	objLoader->loadOBJ("data/mustang.obj");
-	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/mustang.png"));
-	delete objLoader;
 
-	objLoader = new OBJloader();
-	objLoader->loadOBJ("data/football.obj");
-	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/football.png"));
-	delete objLoader;
-
-	objLoader = new OBJloader();
-	objLoader->loadOBJ("data/dog.obj");
-	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/dog.png"));
-	delete objLoader;
-
-	objLoader = new OBJloader();
-	objLoader->loadOBJ("data/cube.obj");
-	glModels.push_back(objLoader->getGlModel(shaderProgram, "data/testTex.png"));
-	delete objLoader;
+	std::vector<std::string> objectToLoad = { //obj files
+		 "mustang", "football", "dog", "cube", "raptor", "cat", "plane" };
+	OBJloader* objLoader;
+	for (auto objectName = objectToLoad.begin(); objectName != objectToLoad.end(); objectName++) {
+		objLoader = new OBJloader();
+		std::string str = "data/" + *objectName + ".obj";
+		objLoader->loadOBJ(str.c_str());
+		str = "data/" + *objectName + ".png";
+		glModels.push_back(objLoader->getGlModel(shaderProgram, str.c_str()));
+		delete objLoader;
+	}
 	
 
 	//Background
